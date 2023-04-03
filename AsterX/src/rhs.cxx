@@ -34,6 +34,18 @@ extern "C" void AsterX_RHS(CCTK_ARGUMENTS) {
   else
     CCTK_ERROR("Unknown value for parameter \"reconstruction_method\"");
 
+  // reconstruction parameters struct
+  reconstruct_params_t reconstruct_params;
+  reconstruct_params.ppm_shock_detection = ppm_shock_detection;
+  reconstruct_params.ppm_zone_flattening = ppm_zone_flattening;
+  reconstruct_params.poly_k = poly_k;
+  reconstruct_params.poly_gamma = poly_gamma;
+  reconstruct_params.ppm_eta1 = ppm_eta1;
+  reconstruct_params.ppm_eta2 = ppm_eta2;
+  reconstruct_params.ppm_eps = ppm_eps;
+  reconstruct_params.ppm_omega1 = ppm_omega1;
+  reconstruct_params.ppm_omega2 = ppm_omega2;
+
   vector_potential_gauge_t gauge;
   if (CCTK_EQUALS(vector_potential_gauge, "algebraic"))
     gauge = vector_potential_gauge_t::algebraic;
@@ -57,6 +69,7 @@ extern "C" void AsterX_RHS(CCTK_ARGUMENTS) {
   const vec<GF3D2<const CCTK_REAL>, dim> gf_F{Fx, Fy, Fz};
   const vec<GF3D2<const CCTK_REAL>, dim> gf_beta{betax, betay, betaz};
   const vec<GF3D2<const CCTK_REAL>, dim> gf_Fbeta{Fbetax, Fbetay, Fbetaz};
+  const vec<GF3D2<const CCTK_REAL>, dim> gf_vels{velx, vely, velz};
   /* grid functions for Upwind CT */
   const vec<GF3D2<const CCTK_REAL>, dim> dBstag_one{dBy_stag, dBz_stag,
                                                     dBx_stag};
@@ -98,24 +111,27 @@ extern "C" void AsterX_RHS(CCTK_ARGUMENTS) {
     if (use_uct) {
 
       const vec<vec<CCTK_REAL, 2>, 3> dBstag_one_rc([&](int m) ARITH_INLINE {
-        return vec<CCTK_REAL, 2>{
-            reconstruct(dBstag_one(m), p, reconstruction, i)};
-        // return vec<CCTK_REAL, 2>{reconstruct_pt(dBstag_one(m), p)};
+        return vec<CCTK_REAL, 2>{reconstruct(dBstag_one(m), p, reconstruction,
+                                             i, false, press, gf_vels(i),
+                                             reconstruct_params)};
       });
 
       const vec<vec<CCTK_REAL, 2>, 3> dBstag_two_rc([&](int m) ARITH_INLINE {
-        return vec<CCTK_REAL, 2>{
-            reconstruct(dBstag_two(m), p, reconstruction, i)};
+        return vec<CCTK_REAL, 2>{reconstruct(dBstag_two(m), p, reconstruction,
+                                             i, false, press, gf_vels(i),
+                                             reconstruct_params)};
       });
 
       const vec<vec<CCTK_REAL, 2>, 3> vtildes_one_rc([&](int m) ARITH_INLINE {
-        return vec<CCTK_REAL, 2>{
-            reconstruct(vtildes_one(m), p, reconstruction, i)};
+        return vec<CCTK_REAL, 2>{reconstruct(vtildes_one(m), p, reconstruction,
+                                             i, false, press, gf_vels(i),
+                                             reconstruct_params)};
       });
 
       const vec<vec<CCTK_REAL, 2>, 3> vtildes_two_rc([&](int m) ARITH_INLINE {
-        return vec<CCTK_REAL, 2>{
-            reconstruct(vtildes_two(m), p, reconstruction, i)};
+        return vec<CCTK_REAL, 2>{reconstruct(vtildes_two(m), p, reconstruction,
+                                             i, false, press, gf_vels(i),
+                                             reconstruct_params)};
       });
 
       // i=dir, j=dir1, k=dir2

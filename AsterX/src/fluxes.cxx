@@ -32,6 +32,28 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
   DECLARE_CCTK_ARGUMENTSX_AsterX_Fluxes;
   DECLARE_CCTK_PARAMETERS;
 
+  /* grid functions for fluxes */
+  const vec<GF3D2<CCTK_REAL>, dim> fluxdenss{fxdens, fydens, fzdens};
+  const vec<GF3D2<CCTK_REAL>, dim> fluxmomxs{fxmomx, fymomx, fzmomx};
+  const vec<GF3D2<CCTK_REAL>, dim> fluxmomys{fxmomy, fymomy, fzmomy};
+  const vec<GF3D2<CCTK_REAL>, dim> fluxmomzs{fxmomz, fymomz, fzmomz};
+  const vec<GF3D2<CCTK_REAL>, dim> fluxtaus{fxtau, fytau, fztau};
+  const vec<GF3D2<CCTK_REAL>, dim> fluxBxs{fxBx, fyBx, fzBx};
+  const vec<GF3D2<CCTK_REAL>, dim> fluxBys{fxBy, fyBy, fzBy};
+  const vec<GF3D2<CCTK_REAL>, dim> fluxBzs{fxBz, fyBz, fzBz};
+  /* grid functions */
+  const vec<GF3D2<const CCTK_REAL>, dim> gf_vels{velx, vely, velz};
+  const vec<GF3D2<const CCTK_REAL>, dim> gf_Bvecs{Bvecx, Bvecy, Bvecz};
+  const vec<GF3D2<const CCTK_REAL>, dim> gf_beta{betax, betay, betaz};
+  const smat<GF3D2<const CCTK_REAL>, dim> gf_g{gxx, gxy, gxz, gyy, gyz, gzz};
+  /* grid functions for Upwind CT */
+  const vec<GF3D2<CCTK_REAL>, dim> vtildes_one{vtilde_y_xface, vtilde_z_yface,
+                                               vtilde_x_zface};
+  const vec<GF3D2<CCTK_REAL>, dim> vtildes_two{vtilde_z_xface, vtilde_x_yface,
+                                               vtilde_y_zface};
+  const vec<GF3D2<CCTK_REAL>, dim> amax{amax_xface, amax_yface, amax_zface};
+  const vec<GF3D2<CCTK_REAL>, dim> amin{amin_xface, amin_yface, amin_zface};
+
   static_assert(dir >= 0 && dir < 3, "");
 
   reconstruction_t reconstruction;
@@ -70,11 +92,24 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
     break;
   }
 
+  // reconstruction parameters struct
+  reconstruct_params_t reconstruct_params;
+  reconstruct_params.ppm_shock_detection = ppm_shock_detection;
+  reconstruct_params.ppm_zone_flattening = ppm_zone_flattening;
+  reconstruct_params.poly_k = poly_k;
+  reconstruct_params.poly_gamma = poly_gamma;
+  reconstruct_params.ppm_eta1 = ppm_eta1;
+  reconstruct_params.ppm_eta2 = ppm_eta2;
+  reconstruct_params.ppm_eps = ppm_eps;
+  reconstruct_params.ppm_omega1 = ppm_omega1;
+  reconstruct_params.ppm_omega2 = ppm_omega2;
+
   const auto reconstruct_pt =
-      [=] CCTK_DEVICE(const GF3D2<const CCTK_REAL> &var, const PointDesc &p)
-          CCTK_ATTRIBUTE_ALWAYS_INLINE {
-            return reconstruct(var, p, reconstruction, dir);
-          };
+      [=] CCTK_DEVICE(const GF3D2<const CCTK_REAL> &var, const PointDesc &p,
+                      const bool &gf_is_rho) CCTK_ATTRIBUTE_ALWAYS_INLINE {
+        return reconstruct(var, p, reconstruction, dir, gf_is_rho, press,
+                           gf_vels(dir), reconstruct_params);
+      };
   const auto calcflux =
       [=] CCTK_DEVICE(vec<vec<CCTK_REAL, 4>, 2> lam, vec<CCTK_REAL, 2> var,
                       vec<CCTK_REAL, 2> flux) CCTK_ATTRIBUTE_ALWAYS_INLINE {
@@ -98,28 +133,6 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
         return flx;
       };
 
-  /* grid functions for fluxes */
-  const vec<GF3D2<CCTK_REAL>, dim> fluxdenss{fxdens, fydens, fzdens};
-  const vec<GF3D2<CCTK_REAL>, dim> fluxmomxs{fxmomx, fymomx, fzmomx};
-  const vec<GF3D2<CCTK_REAL>, dim> fluxmomys{fxmomy, fymomy, fzmomy};
-  const vec<GF3D2<CCTK_REAL>, dim> fluxmomzs{fxmomz, fymomz, fzmomz};
-  const vec<GF3D2<CCTK_REAL>, dim> fluxtaus{fxtau, fytau, fztau};
-  const vec<GF3D2<CCTK_REAL>, dim> fluxBxs{fxBx, fyBx, fzBx};
-  const vec<GF3D2<CCTK_REAL>, dim> fluxBys{fxBy, fyBy, fzBy};
-  const vec<GF3D2<CCTK_REAL>, dim> fluxBzs{fxBz, fyBz, fzBz};
-  /* grid functions */
-  const vec<GF3D2<const CCTK_REAL>, dim> gf_vels{velx, vely, velz};
-  const vec<GF3D2<const CCTK_REAL>, dim> gf_Bvecs{Bvecx, Bvecy, Bvecz};
-  const vec<GF3D2<const CCTK_REAL>, dim> gf_beta{betax, betay, betaz};
-  const smat<GF3D2<const CCTK_REAL>, dim> gf_g{gxx, gxy, gxz, gyy, gyz, gzz};
-  /* grid functions for Upwind CT */
-  const vec<GF3D2<CCTK_REAL>, dim> vtildes_one{vtilde_y_xface, vtilde_z_yface,
-                                               vtilde_x_zface};
-  const vec<GF3D2<CCTK_REAL>, dim> vtildes_two{vtilde_z_xface, vtilde_x_yface,
-                                               vtilde_y_zface};
-  const vec<GF3D2<CCTK_REAL>, dim> amax{amax_xface, amax_yface, amax_zface};
-  const vec<GF3D2<CCTK_REAL>, dim> amin{amin_xface, amin_yface, amin_zface};
-
   // Face-centred grid functions (in direction `dir`)
   constexpr array<int, dim> face_centred = {!(dir == 0), !(dir == 1),
                                             !(dir == 2)};
@@ -130,13 +143,13 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
         /* Reconstruct primitives from the cells on left (indice 0) and right
          * (indice 1) side of this face rc = reconstructed variables or
          * computed from reconstructed variables */
-        const vec<CCTK_REAL, 2> rho_rc{reconstruct_pt(rho, p)};
+        const vec<CCTK_REAL, 2> rho_rc{reconstruct_pt(rho, p, true)};
         const vec<vec<CCTK_REAL, 2>, 3> vels_rc([&](int i) ARITH_INLINE {
-          return vec<CCTK_REAL, 2>{reconstruct_pt(gf_vels(i), p)};
+          return vec<CCTK_REAL, 2>{reconstruct_pt(gf_vels(i), p, false)};
         });
-        const vec<CCTK_REAL, 2> eps_rc{reconstruct_pt(eps, p)};
+        const vec<CCTK_REAL, 2> eps_rc{reconstruct_pt(eps, p, false)};
         const vec<vec<CCTK_REAL, 2>, 3> Bs_rc([&](int i) ARITH_INLINE {
-          return vec<CCTK_REAL, 2>{reconstruct_pt(gf_Bvecs(i), p)};
+          return vec<CCTK_REAL, 2>{reconstruct_pt(gf_Bvecs(i), p, false)};
         });
 
         /* Interpolate metric components from vertices to faces */
@@ -329,6 +342,24 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
           printf("cctk_iteration = %i,  dir = %i,  ijk = %i, %i, %i. \n",
                  cctk_iteration, dir, p.i, p.j, p.k);
           printf("  x, y, z = %16.8e, %16.8e, %16.8e.\n", p.x, p.y, p.z);
+          printf("  fluxdenss = %16.8e, %16.8e \n", fluxdenss(dir)(p.I),
+                 fluxdenss(dir)(p.I + DI[dir]));
+          printf("  lam = %16.8e, %16.8e, %16.8e, %16.8e, %16.8e, %16.8e, "
+                 "%16.8e, %16.8e \n",
+                 lambda(0)(0), lambda(0)(1), lambda(0)(2), lambda(0)(3),
+                 lambda(1)(0), lambda(1)(1), lambda(1)(2), lambda(1)(3));
+          printf("  alp = %16.8e, beta = %16.8e, u = %16.8e \n", alp_avg,
+                 beta_avg, u_avg);
+          printf("  vel_rc = %16.8e, %16.8e \n", vel_rc(0), vel_rc(1));
+          printf("  rho_rc = %16.8e, %16.8e \n", rho_rc(0), rho_rc(1));
+          printf("  eps_rc = %16.8e, %16.8e \n", eps_rc(0), eps_rc(1));
+          printf("  eps = %16.8e \n", eps(p.I));
+          printf("  press_rc = %16.8e, %16.8e \n", press_rc(0), press_rc(1));
+          printf("  cs2_rc = %16.8e, %16.8e \n", cs2_rc(0), cs2_rc(1));
+          printf("  w_lorentz_rc = %16.8e, %16.8e \n", w_lorentz_rc(0),
+                 w_lorentz_rc(1));
+          printf("  h_rc = %16.8e, %16.8e \n", h_rc(0), h_rc(1));
+          printf("  bsq_rc = %16.8e, %16.8e \n", bsq_rc(0), bsq_rc(1));
           printf("  dens_rc = %16.8e, %16.8e,  flux_dens = %16.8e, %16.8e.\n",
                  dens_rc(0), dens_rc(1), flux_dens(0), flux_dens(1));
           printf("  momx_rc = %16.8e, %16.8e,  flux_momx = %16.8e, %16.8e.\n",
