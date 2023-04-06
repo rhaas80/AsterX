@@ -112,25 +112,25 @@ extern "C" void AsterX_RHS(CCTK_ARGUMENTS) {
 
       const vec<vec<CCTK_REAL, 2>, 3> dBstag_one_rc([&](int m) ARITH_INLINE {
         return vec<CCTK_REAL, 2>{reconstruct(dBstag_one(m), p, reconstruction,
-                                             i, false, press, gf_vels(i),
+                                             k, false, press, gf_vels(k),
                                              reconstruct_params)};
       });
 
       const vec<vec<CCTK_REAL, 2>, 3> dBstag_two_rc([&](int m) ARITH_INLINE {
         return vec<CCTK_REAL, 2>{reconstruct(dBstag_two(m), p, reconstruction,
-                                             i, false, press, gf_vels(i),
+                                             j, false, press, gf_vels(j),
                                              reconstruct_params)};
       });
 
       const vec<vec<CCTK_REAL, 2>, 3> vtildes_one_rc([&](int m) ARITH_INLINE {
         return vec<CCTK_REAL, 2>{reconstruct(vtildes_one(m), p, reconstruction,
-                                             i, false, press, gf_vels(i),
+                                             k, false, press, gf_vels(k),
                                              reconstruct_params)};
       });
 
       const vec<vec<CCTK_REAL, 2>, 3> vtildes_two_rc([&](int m) ARITH_INLINE {
         return vec<CCTK_REAL, 2>{reconstruct(vtildes_two(m), p, reconstruction,
-                                             i, false, press, gf_vels(i),
+                                             j, false, press, gf_vels(j),
                                              reconstruct_params)};
       });
 
@@ -146,7 +146,7 @@ extern "C" void AsterX_RHS(CCTK_ARGUMENTS) {
 
       // second term
       CCTK_REAL denom_two = amax_two(i)(p.I) + amin_two(i)(p.I);
-      E += (amax_two(i)(p.I) * vtildes_two_rc(i)(0) * dBstag_two_rc(i)(0) +
+      E -= (amax_two(i)(p.I) * vtildes_two_rc(i)(0) * dBstag_two_rc(i)(0) +
             amin_two(i)(p.I) * vtildes_two_rc(i)(1) * dBstag_two_rc(i)(1) -
             amax_two(i)(p.I) * amin_two(i)(p.I) *
                 (dBstag_two_rc(i)(1) - dBstag_two_rc(i)(0))) /
