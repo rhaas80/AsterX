@@ -44,14 +44,13 @@ monocentral(const T &x, const T &y) {
 CCTK_DEVICE array<CCTK_REAL, 2>
 reconstruct(const GF3D2<const CCTK_REAL> &gf_var, const PointDesc &p,
             reconstruction_t reconstruction, int dir) {
-  constexpr auto DI = PointDesc::DI;
   // Neighbouring "plus" and "minus" cell indices
-  const auto Immm = p.I - 3 * DI[dir];
-  const auto Imm = p.I - 2 * DI[dir];
-  const auto Im = p.I - DI[dir];
+  const auto Immm = p.I - 3 * p.DI[dir];
+  const auto Imm = p.I - 2 * p.DI[dir];
+  const auto Im = p.I - p.DI[dir];
   const auto Ip = p.I;
-  const auto Ipp = p.I + DI[dir];
-  const auto Ippp = p.I + 2 * DI[dir];
+  const auto Ipp = p.I + p.DI[dir];
+  const auto Ippp = p.I + 2 * p.DI[dir];
 
   switch (reconstruction) {
 
