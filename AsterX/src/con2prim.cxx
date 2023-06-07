@@ -91,14 +91,17 @@ void AsterX_Con2Prim_typeEoS(CCTK_ARGUMENTS, EOSIDType &eos_cold,
       atmo.set(pv_seeds);
     }
 
-    CCTK_INT c2p_succeeded_Noble = 0; // false for now
+    CCTK_INT c2p_succeeded_Noble = 1; // false for now
     CCTK_INT c2p_succeeded_Pal = 0;   // false for now
-    c2p_Noble.solve(eos_th, pv, pv_seeds, cv, glo, c2p_succeeded_Noble);
 
+/* Not calling Noble C2P for now    
+    c2p_Noble.solve(eos_th, pv, pv_seeds, cv, glo, c2p_succeeded_Noble);
     if (!c2p_succeeded_Noble) {
       c2p_Pal.solve(eos_th, pv, pv_seeds, cv, glo, c2p_succeeded_Pal);
     }
-
+*/
+    
+    c2p_Pal.solve(eos_th, pv, pv_seeds, cv, glo, c2p_succeeded_Pal);
     if (!c2p_succeeded_Noble && !c2p_succeeded_Pal) {
       con2prim_flag(p.I) = 0;
       if (debug_mode) {
