@@ -171,10 +171,10 @@ c2p_1DPalenzuela::xPalenzuelaToPrim(CCTK_REAL xPalenzuela_Sol, CCTK_REAL Ssq,
 
   pv.w_lor = W_sol;
 
-  vec<CCTK_REAL, 3> v_low = calc_contraction(glo, pv.vel);
-  CCTK_REAL vsq_Sol = calc_contraction(v_low, pv.vel);
+//  vec<CCTK_REAL, 3> v_low = calc_contraction(glo, pv.vel);
+//  CCTK_REAL vsq_Sol = calc_contraction(v_low, pv.vel);
 
-  pv.eps = (Z_Sol * (1. - vsq_Sol) / pv.rho - 1.0) / GammaIdealFluid;
+//  pv.eps = (Z_Sol * (1. - vsq_Sol) / pv.rho - 1.0) / GammaIdealFluid;
 
   pv.Ye = cv.dYe / cv.dens;
 
@@ -263,7 +263,7 @@ c2p_1DPalenzuela::solve(EOSType &eos_th, prim_vars &pv, prim_vars &pv_seeds,
   c2p_succeeded = false; // 0 //false
 
   // Find x, this is the recovery process
-  const CCTK_INT minbits = std::numeric_limits<CCTK_REAL>::digits - 4;
+  const CCTK_INT minbits = std::numeric_limits<CCTK_REAL>::digits; // - 4;
   const CCTK_INT maxiters = maxIterations;
   CCTK_INT iters;
 
