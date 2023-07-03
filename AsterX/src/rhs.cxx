@@ -128,25 +128,25 @@ extern "C" void AsterX_RHS(CCTK_ARGUMENTS) {
 
       const vec<vec<CCTK_REAL, 2>, 3> dBstag_one_rc([&](int m) ARITH_INLINE {
         return vec<CCTK_REAL, 2>{reconstruct(dBstag_one(m), p, reconstruction,
-                                             k, false, press, gf_vels(k),
+                                             k, false, false, press, gf_vels(k),
                                              reconstruct_params)};
       });
 
       const vec<vec<CCTK_REAL, 2>, 3> dBstag_two_rc([&](int m) ARITH_INLINE {
         return vec<CCTK_REAL, 2>{reconstruct(dBstag_two(m), p, reconstruction,
-                                             j, false, press, gf_vels(j),
+                                             j, false, false, press, gf_vels(j),
                                              reconstruct_params)};
       });
 
       const vec<vec<CCTK_REAL, 2>, 3> vtildes_one_rc([&](int m) ARITH_INLINE {
         return vec<CCTK_REAL, 2>{reconstruct(vtildes_one(m), p, reconstruction,
-                                             k, false, press, gf_vels(k),
+                                             k, false, false, press, gf_vels(k),
                                              reconstruct_params)};
       });
 
       const vec<vec<CCTK_REAL, 2>, 3> vtildes_two_rc([&](int m) ARITH_INLINE {
         return vec<CCTK_REAL, 2>{reconstruct(vtildes_two(m), p, reconstruction,
-                                             j, false, press, gf_vels(j),
+                                             j, false, false, press, gf_vels(j),
                                              reconstruct_params)};
       });
 
