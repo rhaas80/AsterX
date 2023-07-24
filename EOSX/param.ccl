@@ -5,6 +5,7 @@ restricted:
 KEYWORD evol_eos_name "Name of active EOS for evolution"
 {
   "IdealGas" :: "Ideal Gas"
+  "Hybrid" :: ""
   "Tabulated3d" :: "EOS Tabulated in (rho, T, Ye)"
   "none" :: "No EOS available"
 } "IdealGas"

@@ -17,7 +17,7 @@ public:
   range rgeps;
 
   // constructor
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_tabulated3d(
+  CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_tabulated3d(
       const string &filename, const bool &read_EOSTable_parallel, const range &rgeps_,
     const range &rgrho_, const range &rgye_) {
     auto fapl_id = H5Pcreate(H5P_FILE_ACCESS);
@@ -105,6 +105,13 @@ CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL entropy_from
  range_eps_from_valid_rho_ye(const CCTK_REAL rho,
                                           const CCTK_REAL ye) const {
   return rgeps;
+}
+
+CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
+eps_from_valid_rho_press_ye(const CCTK_REAL rho,
+                                          const CCTK_REAL press,
+                                          const CCTK_REAL ye) const {
+  return 0.0; //press / (rho * gm1);
 }
 
 };
