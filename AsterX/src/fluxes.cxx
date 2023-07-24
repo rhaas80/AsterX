@@ -491,7 +491,11 @@ extern "C" void AsterX_Fluxes(CCTK_ARGUMENTS) {
     break;
   }
   case eos_t::Tabulated: {
-    CCTK_ERROR("Tabulated EOS is not yet supported");
+    const string filename = EOSTable_filename;
+    const eos_tabulated3d eos_th(filename, read_EOSTable_parallel, rgeps, rgrho, rgye);
+    CalcFlux<0>(cctkGH, eos_th);
+    CalcFlux<1>(cctkGH, eos_th);
+    CalcFlux<2>(cctkGH, eos_th);
     break;
   }
   default:
