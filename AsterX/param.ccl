@@ -1,12 +1,5 @@
 # Parameter definitions for thorn AsterX
 
-KEYWORD evolution_eos "Equation of state employed during evolution" STEERABLE=never
-{
-  "IdealGas" :: ""
-  "Hybrid" :: ""
-  "Tabulated" :: ""
-} "IdealGas"
-
 KEYWORD vector_potential_gauge "Gauge choice of four-vector potential A" STEERABLE=never
 {
   "algebraic" :: ""
@@ -94,6 +87,7 @@ CCTK_INT local_spatial_order "Order of spatial finite differencing" STEERABLE=ne
 } 2
 
 SHARES: EOSX
+USES KEYWORD evol_eos_name
 USES CCTK_REAL poly_gamma
 USES CCTK_REAL poly_k
 USES CCTK_REAL gl_gamma

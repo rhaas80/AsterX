@@ -210,11 +210,11 @@ extern "C" void AsterX_Con2Prim(CCTK_ARGUMENTS) {
   eos::range rgeps(eps_min, eps_max), rgrho(rho_min, rho_max),
       rgye(ye_min, ye_max);
 
-  if (CCTK_EQUALS(evolution_eos, "IdealGas")) {
+  if (CCTK_EQUALS(evol_eos_name, "IdealGas")) {
     eostype = eos_t::IdealGas;
-  } else if (CCTK_EQUALS(evolution_eos, "Hybrid")) {
+  } else if (CCTK_EQUALS(evol_eos_name, "Hybrid")) {
     eostype = eos_t::Hybrid;
-  } else if (CCTK_EQUALS(evolution_eos, "Tabulated")) {
+  } else if (CCTK_EQUALS(evol_eos_name, "Tabulated3d")) {
     eostype = eos_t::Tabulated;
   } else {
     CCTK_ERROR("Unknown value for parameter \"evolution_eos\"");
