@@ -18,7 +18,8 @@ public:
 
   // constructor
   CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_tabulated3d(
-      const string &filename, const bool &read_EOSTable_parallel) {
+      const string &filename, const bool &read_EOSTable_parallel, const range &rgeps_,
+    const range &rgrho_, const range &rgye_) {
     auto fapl_id = H5Pcreate(H5P_FILE_ACCESS);
     assert(fapl_id >= 0);
     hid_t file_id = 0;
@@ -44,8 +45,61 @@ public:
     if(read_EOSTable_parallel || !mpi_rank_id) {
       CHECK_ERROR(H5Fclose(file_id));
     }
+
+    set_range_rho(rgrho_);
+    set_range_ye(rgye_);
+    // TODO: first compute temp as a function of rho, ye, and eps, and then initialize its range
+    // For now, as dummy, we pass range of eps as range of temp
+    set_range_temp(rgeps_);
   }
-};
+
+  // destructor
+  //CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline ~eos_tabulated3d();
+
+
+  // routines
+  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL press_from_valid_rho_eps_ye(const CCTK_REAL rho, const CCTK_REAL eps, const CCTK_REAL ye) const
+{
+  CCTK_REAL press = 0.0; //tab3d_press(rho, eps, ye, &ierr);
+  return press;
+}
+
+CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL csnd_from_valid_rho_eps_ye(const CCTK_REAL rho, const CCTK_REAL eps, const CCTK_REAL ye) const
+{
+  CCTK_REAL csnd2 = 0.0; //tab3d_csnd2(rho, eps, ye, &ierr);
+  assert(csnd2 >= 0); //Soundspeed^2 should never ever be negative
+  return sqrt(csnd2);
+}
+
+CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL temp_from_valid_rho_eps_ye(const CCTK_REAL rho, const CCTK_REAL eps, const CCTK_REAL ye) const
+{
+  CCTK_REAL temp = 0.0; //tab3d_temp(rho, eps, ye, &ierr);
+  return temp;
+}
+
+CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void press_derivs_from_valid_rho_eps_ye(CCTK_REAL& press, CCTK_REAL& dpdrho, CCTK_REAL& dpdeps,
+           const CCTK_REAL rho, const CCTK_REAL eps, const CCTK_REAL ye) const
+{
+  printf("press_derivs_from_valid_rho_eps_ye is not supported anymore!");
+  exit(EXIT_FAILURE);
+}
+
+CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL press_from_valid_rho_temp_ye(const CCTK_REAL rho, const CCTK_REAL temp, const CCTK_REAL ye) const
+{
+    return 0.0; //tab3d_press_from_temp(rho, temp, ye);
+}
+
+CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL csnd_from_valid_rho_temp_ye(const CCTK_REAL rho, const CCTK_REAL temp, const CCTK_REAL ye) const
+{
+  CCTK_REAL csnd2 = 0.0; //tab3d_csnd2_from_temp(rho, temp, ye);
+  assert(csnd2 >= 0); //Soundspeed^2 should never ever be negative
+  return sqrt(csnd2);
+}
+
+CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL entropy_from_valid_rho_temp_ye(const CCTK_REAL rho, const CCTK_REAL temp, const CCTK_REAL ye) const
+{
+    return 0.0; //tab3d_entropy_from_temp(rho, temp, ye);
+}
 
   CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline range
  range_eps_from_valid_rho_ye(const CCTK_REAL rho,
@@ -53,6 +107,7 @@ public:
   return rgeps;
 }
 
+};
 } // namespace EOSX
 
 #endif
