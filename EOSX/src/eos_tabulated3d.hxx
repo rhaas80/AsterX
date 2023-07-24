@@ -13,6 +13,7 @@ namespace EOSX {
 
 class eos_tabulated3d : public eos {
 public:
+  CCTK_REAL gamma;
   range rgeps;
 
   // constructor
@@ -45,6 +46,12 @@ public:
     }
   }
 };
+
+  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline range
+ range_eps_from_valid_rho_ye(const CCTK_REAL rho,
+                                          const CCTK_REAL ye) const {
+  return rgeps;
+}
 
 } // namespace EOSX
 
