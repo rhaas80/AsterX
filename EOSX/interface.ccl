@@ -6,3 +6,4 @@ INCLUDES HEADER: eos.hxx IN eos.hxx
 INCLUDES HEADER: eos_1p.hxx IN eos_1p.hxx
 INCLUDES HEADER: eos_idealgas.hxx IN eos_idealgas.hxx
 INCLUDES HEADER: eos_polytropic.hxx IN eos_polytropic.hxx
+INCLUDES HEADER: eos_tabulated3d.hxx IN eos_tabulated3d.hxx

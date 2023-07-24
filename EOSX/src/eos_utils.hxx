@@ -15,6 +15,17 @@ using namespace std;
 using namespace Loop;
 using namespace Arith;
 
+// Macro checking for errors coming from routines returning error codes
+#define CHECK_ERROR(routine)                                \
+do {                                                        \
+    const auto err = routine;                               \
+    if (err < 0) {                                          \
+        CCTK_VERROR("Routine '%s' returned error code %d",  \
+                    #routine, err);                         \
+    }                                                       \
+} while (0)
+
+
 /// Class representing a range
 struct eos_range {
   CCTK_REAL min; ///< Minimum

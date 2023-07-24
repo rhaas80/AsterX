@@ -5,6 +5,7 @@ restricted:
 KEYWORD evol_eos_name "Name of active EOS for evolution"
 {
   "IdealGas" :: "Ideal Gas"
+  "Tabulated3d" :: "EOS Tabulated in (rho, T, Ye)"
   "none" :: "No EOS available"
 } "IdealGas"
 
@@ -63,3 +64,13 @@ CCTK_REAL particle_mass "mass used to formally compute temperature from kinetic 
   0:* :: "in MeV"
 } 938.985
 
+#parameters for Tabulated 3D EOS
+
+CCTK_STRING EOSTable_filename "File name of the 3D EOS table" STEERABLE=RECOVER 
+{  
+  ".+" :: ""
+} "."
+
+BOOLEAN read_EOSTable_parallel "Read the EOS table in parallel" STEERABLE=RECOVER
+{
+} no

@@ -1,8 +1,6 @@
 #ifndef EOS_IDEALGAS_HXX
 #define EOS_IDEALGAS_HXX
 
-#include <stdexcept>
-#include <algorithm>
 #include <cmath>
 
 #include "eos.hxx"
