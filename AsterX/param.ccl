@@ -104,6 +104,7 @@ USES CCTK_REAL rho_max
 USES CCTK_REAL ye_min
 USES CCTK_REAL ye_max
 USES CCTK_REAL particle_mass
+USES BOOLEAN read_EOSTable_parallel
 
 SHARES: Con2PrimFactory
 USES CCTK_REAL eps_atmo

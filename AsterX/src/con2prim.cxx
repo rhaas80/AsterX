@@ -15,6 +15,7 @@
 
 #include <eos.hxx>
 #include <eos_idealgas.hxx>
+#include <eos_tabulated3d.hxx>
 
 #include "utils.hxx"
 
@@ -235,7 +236,13 @@ extern "C" void AsterX_Con2Prim(CCTK_ARGUMENTS) {
     break;
   }
   case eos_t::Tabulated: {
-    CCTK_ERROR("Tabulated EOS is not yet supported");
+    CCTK_REAL n = 1 / (poly_gamma - 1); // Polytropic index
+    CCTK_REAL rmd_p = pow(poly_k, -n);  // Polytropic density scale
+
+    const eos_polytrope eos_cold(n, rmd_p, rho_max);
+    const eos_tabulated3d eos_th(EOSTable_filename);
+
+    AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, eos_cold, eos_th);
     break;
   }
   default:
