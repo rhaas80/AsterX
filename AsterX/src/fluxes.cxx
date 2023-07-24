@@ -14,6 +14,7 @@
 #include <reconstruct.hxx>
 #include <eos.hxx>
 #include <eos_idealgas.hxx>
+#include <eos_tabulated3d.hxx>
 
 namespace AsterX {
 using namespace std;
