@@ -492,8 +492,9 @@ extern "C" void AsterX_Fluxes(CCTK_ARGUMENTS) {
     break;
   }
   case eos_t::Tabulated: {
+    // FIXME: DON'T build the tabulated EOS object here!
     const string filename = EOSTable_filename;
-    const eos_tabulated3d eos_th(filename, read_EOSTable_parallel, rgeps, rgrho, rgye);
+    const eos_tabulated3d eos_th(rgeps, rgrho, rgye);
     CalcFlux<0>(cctkGH, eos_th);
     CalcFlux<1>(cctkGH, eos_th);
     CalcFlux<2>(cctkGH, eos_th);

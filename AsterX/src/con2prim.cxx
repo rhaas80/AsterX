@@ -239,9 +239,10 @@ extern "C" void AsterX_Con2Prim(CCTK_ARGUMENTS) {
     CCTK_REAL n = 1 / (poly_gamma - 1); // Polytropic index
     CCTK_REAL rmd_p = pow(poly_k, -n);  // Polytropic density scale
 
+    // FIXME: DON'T build the tabulated EOS object here!
     const eos_polytrope eos_cold(n, rmd_p, rho_max);
     const string filename = EOSTable_filename;
-    const eos_tabulated3d eos_th(filename, read_EOSTable_parallel, rgeps, rgrho, rgye);
+    const eos_tabulated3d eos_th(rgeps, rgrho, rgye);
 
     AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, eos_cold, eos_th);
     break;
