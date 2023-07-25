@@ -21,24 +21,25 @@ functions.
 */
 
 class eos_polytrope : public eos_1p {
-  CCTK_REAL n;     ///< Polytropic index \f$ n \f$
-  CCTK_REAL rho_p; ///< Polytropic density scale \f$ \rho_p \f$
-  CCTK_REAL np1;   ///< \f$ n+1 \f$
-  CCTK_REAL gamma; ///< Polytropic exponent \f$ \Gamma \f$
-  CCTK_REAL invn;  ///< \f$ \frac{1}{n} \f$
+  CCTK_REAL poly_k;     ///< Polytropic density scale \f$ K \f$
+  CCTK_REAL poly_gamma; ///< Polytropic exponent \f$ \Gamma \f$
+  CCTK_REAL n;          ///< Polytropic index \f$ n = 1/(\Gamma-1) \f$
+  CCTK_REAL np1;        ///< \f$ n+1 \f$
+  CCTK_REAL invn;       ///< \f$ \frac{1}{n} \f$
+  CCTK_REAL rho_p;      ///< Weird polytropic density scal \f$ rho_p \f$
 
   CCTK_DEVICE CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline void
-  init(CCTK_REAL n_,      ///< Adiabatic index \f$ n \f$
-       CCTK_REAL rho_p_,  ///< Density scale \f$ \rho_p \f$
-       CCTK_REAL rho_max_ ///< Max valid density
+  init(CCTK_REAL poly_gamma_, ///< Adiabatic index \f$ n \f$
+       CCTK_REAL poly_k_,     ///< Density scale \f$ K \f$
+       CCTK_REAL rho_max_     ///< Max valid density
   );
 
 public:
   /// Constructor
   CCTK_DEVICE CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_polytrope(
-      CCTK_REAL n_,      ///< Adiabatic index \f$ n \f$
-      CCTK_REAL rho_p_,  ///< Density scale \f$ \rho_p \f$
-      CCTK_REAL rho_max_ ///< Max valid density
+      CCTK_REAL poly_gamma_, ///< Adiabatic exponent \f$ \Gamma \f$
+      CCTK_REAL poly_k_,     ///< Density scale \f$ K \f$
+      CCTK_REAL rho_max_     ///< Max valid density
   );
 
   CCTK_DEVICE CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
@@ -60,20 +61,21 @@ public:
 };
 
 CCTK_DEVICE CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline void
-eos_polytrope::init(CCTK_REAL n_, CCTK_REAL rho_p_, CCTK_REAL rho_max_) {
-  n = n_;
-  rho_p = rho_p_;
-  np1 = n + 1;
-  gamma = 1.0 + 1.0 / n;
-  invn = 1.0 / n;
-
+eos_polytrope::init(
+    CCTK_REAL poly_gamma_, CCTK_REAL poly_k_, CCTK_REAL rho_max_) {
+  poly_k     = poly_k_;
+  poly_gamma = poly_gamma_;
+  n          = 1.0/(poly_gamma-1.0);
+  np1        = n + 1;
+  invn       = 1.0 / n;
+  rho_p      = pow(poly_k, -n);
   // set_ranges(range(0, rho_max_));
 }
 
 CCTK_DEVICE
 CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_polytrope::eos_polytrope(
-    CCTK_REAL n_, CCTK_REAL rho_p_, CCTK_REAL rho_max_) {
-  init(n_, rho_p_, rho_max_);
+    CCTK_REAL poly_gamma_, CCTK_REAL poly_k_, CCTK_REAL rho_max_) {
+  init(poly_gamma_, poly_k_, rho_max_);
 }
 
 CCTK_DEVICE CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
@@ -95,7 +97,7 @@ eos_polytrope::gm1_from_valid_p(const CCTK_REAL p) const {
 CCTK_DEVICE CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
 eos_polytrope::sed_from_valid_gm1(const CCTK_REAL gm1 ///< \f$ g-1 \f$
 ) const {
-  return gm1 / gamma;
+  return gm1 / poly_gamma;
 }
 
 /**
