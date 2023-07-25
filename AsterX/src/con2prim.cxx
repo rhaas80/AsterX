@@ -37,7 +37,7 @@ void AsterX_Con2Prim_typeEoS(CCTK_ARGUMENTS, EOSIDType &eos_cold,
 
   // Setting up atmosphere
   const CCTK_REAL rho_atmo_cut = rho_abs_min * (1 + atmo_tol);
-  const CCTK_REAL gm1 = eos_cold.gm1_from_valid_rmd(rho_abs_min);
+  const CCTK_REAL gm1 = eos_cold.gm1_from_valid_rho(rho_abs_min);
   CCTK_REAL eps_atm = eos_cold.sed_from_valid_gm1(gm1);
   eps_atm = std::min(std::max(eos_th.rgeps.min, eps_atm), eos_th.rgeps.max);
   const CCTK_REAL p_atm =
@@ -223,9 +223,9 @@ extern "C" void AsterX_Con2Prim(CCTK_ARGUMENTS) {
   switch (eostype) {
   case eos_t::IdealGas: {
     CCTK_REAL n = 1 / (poly_gamma - 1); // Polytropic index
-    CCTK_REAL rmd_p = pow(poly_k, -n);  // Polytropic density scale
+    CCTK_REAL rho_p = pow(poly_k, -n);  // Polytropic density scale
 
-    const eos_polytrope eos_cold(n, rmd_p, rho_max);
+    const eos_polytrope eos_cold(n, rho_p, rho_max);
     const eos_idealgas eos_th(gl_gamma, particle_mass, rgeps, rgrho, rgye);
 
     AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, eos_cold, eos_th);
@@ -237,10 +237,10 @@ extern "C" void AsterX_Con2Prim(CCTK_ARGUMENTS) {
   }
   case eos_t::Tabulated: {
     CCTK_REAL n = 1 / (poly_gamma - 1); // Polytropic index
-    CCTK_REAL rmd_p = pow(poly_k, -n);  // Polytropic density scale
+    CCTK_REAL rho_p = pow(poly_k, -n);  // Polytropic density scale
 
     // FIXME: DON'T build the tabulated EOS object here!
-    const eos_polytrope eos_cold(n, rmd_p, rho_max);
+    const eos_polytrope eos_cold(n, rho_p, rho_max);
     const string filename = EOSTable_filename;
     const eos_tabulated3d eos_th(rgeps, rgrho, rgye);
 
