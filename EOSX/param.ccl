@@ -71,7 +71,3 @@ CCTK_STRING EOSTable_filename "File name of the 3D EOS table" STEERABLE=RECOVER
 {  
   ".+" :: ""
 } "."
-
-BOOLEAN read_EOSTable_parallel "Read the EOS table in parallel" STEERABLE=RECOVER
-{
-} no
