@@ -223,8 +223,10 @@ extern "C" void AsterX_Con2Prim(CCTK_ARGUMENTS) {
   switch (eostype) {
   case eos_t::IdealGas: {
 
-    const eos_polytrope eos_cold(poly_gamma, poly_k, rho_max);
-    const eos_idealgas eos_th(gl_gamma, particle_mass, rgeps, rgrho, rgye);
+    eos_polytrope eos_cold;
+    eos_cold.init(poly_gamma, poly_k, rho_max);
+    eos_idealgas eos_th;
+    eos_th.init(gl_gamma, particle_mass, rgeps, rgrho, rgye);
 
     AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, eos_cold, eos_th);
     break;
@@ -236,10 +238,12 @@ extern "C" void AsterX_Con2Prim(CCTK_ARGUMENTS) {
   case eos_t::Tabulated: {
 
     // FIXME: DON'T build the tabulated EOS object here!
-    const eos_polytrope eos_cold(poly_gamma, poly_k, rho_max);
-    const string filename = EOSTable_filename;
-    const eos_tabulated3d eos_th(rgeps, rgrho, rgye);
-
+    eos_polytrope eos_cold;
+    eos_cold.init(poly_gamma, poly_k, rho_max);
+    const string eos_filename = EOSTable_filename;
+    eos_tabulated3d eos_th;
+    eos_th.init(rgeps, rgrho, rgye);
+    eos_th.read_eos_table(eos_filename);
     AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, eos_cold, eos_th);
     break;
   }

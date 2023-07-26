@@ -4,6 +4,7 @@
 #include <cctk.h>
 #include <cctk_Arguments.h>
 #include <cctk_Parameters.h>
+#include <AMReX.H>
 
 #include <eos_1p.hxx>
 #include <eos_polytropic.hxx>
@@ -14,12 +15,15 @@
 
 namespace AsterX {
 
+using namespace Arith;
+using namespace AMReX;
+
 // initial data EOS
-extern EOSX::eos_polytrope *eos_poly;
+extern Vector<EOSX::eos_polytrope, 1> eos_poly;
 
 // evolution EOS
-extern EOSX::eos_idealgas *eos_ig;
-extern EOSX::eos_tabulated3d *eos_tab3d;
+extern Vector<EOSX::eos_idealgas, 1> eos_ig;
+extern Vector<EOSX::eos_tabulated3d, 1> eos_tab3d;
 
 } // namespace AsterX
 
