@@ -10,12 +10,7 @@
 #include "c2p_1DPalenzuela.hxx"
 #include "c2p_2DNoble.hxx"
 
-#include <eos_1p.hxx>
-#include <eos_polytropic.hxx>
-
-#include <eos.hxx>
-#include <eos_idealgas.hxx>
-#include <eos_tabulated3d.hxx>
+#include <setup_eos.hxx>
 
 #include "utils.hxx"
 

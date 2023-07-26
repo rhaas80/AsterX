@@ -12,9 +12,7 @@
 #include "utils.hxx"
 #include "fluxes.hxx"
 #include <reconstruct.hxx>
-#include <eos.hxx>
-#include <eos_idealgas.hxx>
-#include <eos_tabulated3d.hxx>
+#include <setup_eos.hxx>
 
 namespace AsterX {
 using namespace std;

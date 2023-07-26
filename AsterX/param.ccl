@@ -87,6 +87,7 @@ CCTK_INT local_spatial_order "Order of spatial finite differencing" STEERABLE=ne
 } 2
 
 SHARES: EOSX
+USES KEYWORD id_eos_name
 USES KEYWORD evol_eos_name
 USES CCTK_REAL poly_gamma
 USES CCTK_REAL poly_k
