@@ -6,12 +6,12 @@
 #include <cctk_Parameters.h>
 #include <AMReX.H>
 
-#include <eos_1p.hxx>
-#include <eos_polytropic.hxx>
+#include "eos_1p.hxx"
+#include "eos_polytropic.hxx"
 
-#include <eos.hxx>
-#include <eos_idealgas.hxx>
-#include <eos_tabulated3d.hxx>
+#include "eos.hxx"
+#include "eos_idealgas.hxx"
+#include "eos_tabulated3d.hxx"
 
 namespace EOSX {
 
