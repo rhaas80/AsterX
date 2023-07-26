@@ -39,7 +39,7 @@ extern "C" void Tests3D_Initialize(CCTK_ARGUMENTS) {
             velz(p.I) = 0.0;
             press(p.I) = 1.0;
           }
-          eps(p.I) = eos_ig[0].eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
+          eps(p.I) = eos_ig.eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
                                                         dummy_ye);
         });
 
