@@ -223,7 +223,7 @@ extern "C" void AsterX_Con2Prim(CCTK_ARGUMENTS) {
     //eos_idealgas eos_th;
     //eos_th.init(gl_gamma, particle_mass, rgeps, rgrho, rgye);
 
-    AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, eos_poly, eos_ig);
+    AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, eos_poly.data()[0], eos_ig.data()[0]);
     break;
   }
   case eos_t::Hybrid: {
@@ -239,7 +239,7 @@ extern "C" void AsterX_Con2Prim(CCTK_ARGUMENTS) {
     //eos_tabulated3d eos_th;
     //eos_th.init(rgeps, rgrho, rgye);
     //eos_th.read_eos_table(eos_filename);
-    AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, eos_poly, eos_tab3d);
+    AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, eos_poly.data()[0], eos_tab3d.data()[0]);
     break;
   }
   default:
