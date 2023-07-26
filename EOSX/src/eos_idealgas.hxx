@@ -89,6 +89,9 @@ CCTK_HOST
 CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void eos_idealgas::init(
     CCTK_REAL gamma_, CCTK_REAL umass_, const range &rgeps_,
     const range &rgrho_, const range &rgye_) {
+  gamma = gamma_;
+  gm1 = gamma_ - 1;
+  rgeps = rgeps_; 
   if (gamma < 1) {
     assert(0);
     // runtime_error("EOS_IdealGas: initialized with gamma < 1");
