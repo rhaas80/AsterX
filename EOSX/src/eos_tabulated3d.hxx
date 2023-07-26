@@ -1,11 +1,14 @@
 #ifndef EOS_TABULATED3D_HXX
 #define EOS_TABULATED3D_HXX
 
+#include <cctk.h>
 #include <cmath>
 #include <hdf5.h>
 #include <mpi.h>
 #include "eos.hxx"
 #include <string>
+
+#include <AMReX.H>
 
 using namespace std;
 
@@ -15,6 +18,10 @@ class eos_tabulated3d : public eos {
 public:
   CCTK_REAL gamma;  // FIXME: get rid of this
   range rgeps;
+  
+  CCTK_INT ntemp, nrho, nye;
+  amrex::Vector<CCTK_REAL> logtemp, logrho, ye;
+  
 
   CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void init(
     const range &rgeps_, const range &rgrho_, const range &rgye_)
