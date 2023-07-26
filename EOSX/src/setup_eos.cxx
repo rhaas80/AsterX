@@ -12,11 +12,11 @@ enum class eos_id {Polytropic, PWPolytropic};
 enum class eos_evol { IdealGas, Hybrid, Tabulated };
 
 // initial data EOS
-Vector<eos_polytrope> eos_poly;
+Vector<eos_polytrope> eos_poly(1);
 
 // evolution EOS
-Vector<eos_idealgas> eos_ig;
-Vector<eos_tabulated3d> eos_tab3d;
+Vector<eos_idealgas> eos_ig(1);
+Vector<eos_tabulated3d> eos_tab3d(1);
 
 extern "C" void EOSX_Setup_EOSID(CCTK_ARGUMENTS) {
   DECLARE_CCTK_PARAMETERS;
@@ -33,9 +33,11 @@ extern "C" void EOSX_Setup_EOSID(CCTK_ARGUMENTS) {
   switch (eos_id_type) {
     case eos_id::Polytropic: {
       eos_poly[0].init(poly_gamma, poly_k, rho_max);
+      break;
     }
     case eos_id::PWPolytropic: {
       CCTK_ERROR("Piecewise Polytrope EOS is not supported yet!");
+      break;
     }
     default:
       assert(0);
