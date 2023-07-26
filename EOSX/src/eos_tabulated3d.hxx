@@ -27,7 +27,7 @@ public:
   }
 
   // Routine reading the EOS table and filling the corresponding object
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void read_eos_table(const string &filename) {
+  CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline void read_eos_table(const string &filename) {
     auto fapl_id = H5Pcreate(H5P_FILE_ACCESS);
     assert(fapl_id >= 0);
     hid_t file_id = 0;
