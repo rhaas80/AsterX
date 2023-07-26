@@ -8,7 +8,7 @@
 #include "eos.hxx"
 #include <string>
 
-#include <AMReX.H>
+//#include <AMReX.H>
 
 using namespace std;
 
@@ -20,7 +20,7 @@ public:
   range rgeps;
   
   CCTK_INT ntemp, nrho, nye;
-  amrex::Vector<CCTK_REAL> logtemp, logrho, ye;
+//  amrex::Vector<CCTK_REAL> logtemp, logrho, ye;
   
 
   CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void init(
