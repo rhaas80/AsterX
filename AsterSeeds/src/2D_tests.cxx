@@ -24,7 +24,8 @@ extern "C" void Tests2D_Initialize(CCTK_ARGUMENTS) {
   eos::range rgeps(eps_min, eps_max), rgrho(rho_min, rho_max),
       rgye(ye_min, ye_max);
 
-  const eos_idealgas eos_th(gl_gamma, particle_mass, rgeps, rgrho, rgye);
+  eos_idealgas eos_th;
+  eos_th.init(gl_gamma, particle_mass, rgeps, rgrho, rgye);
   const CCTK_REAL dummy_ye = 0.5;
 
   // See Cipolletta et al (2020) and Del Zanna, Bucciantini, Londrillo (2003)

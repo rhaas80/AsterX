@@ -24,7 +24,8 @@ extern "C" void Tests3D_Initialize(CCTK_ARGUMENTS) {
   eos::range rgeps(eps_min, eps_max), rgrho(rho_min, rho_max),
       rgye(ye_min, ye_max);
 
-  const eos_idealgas eos_th(gl_gamma, particle_mass, rgeps, rgrho, rgye);
+  eos_idealgas eos_th;
+  eos_th.init(gl_gamma, particle_mass, rgeps, rgrho, rgye);
   const CCTK_REAL dummy_ye = 0.5;
 
   if (CCTK_EQUALS(test_case, "spherical shock")) {
