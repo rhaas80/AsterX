@@ -1,6 +1,8 @@
 #ifndef EOS_UTILS_HXX
 #define EOS_UTILS_HXX
 
+#include <loop_device.hxx>
+
 #include <cctk.h>
 #include <cctk_Arguments.h>
 #include <cctk_Parameters.h>
@@ -12,8 +14,6 @@
 namespace EOSX {
 
 using namespace std;
-using namespace Loop;
-using namespace Arith;
 
 // Macro checking for errors coming from routines returning error codes
 #define CHECK_ERROR(routine)                                \

@@ -2,6 +2,13 @@
 
 restricted:
 
+KEYWORD id_eos_name "Name of active EOS for initial data"
+{
+  "Polytropic" :: ""
+  "PWPolytropic" :: ""
+  "none" :: "No EOS available"
+} "Polytropic"
+
 KEYWORD evol_eos_name "Name of active EOS for evolution"
 {
   "IdealGas" :: "Ideal Gas"

@@ -1,6 +1,9 @@
 # Interface definition for thorn EOSX
 
 implements: EOSX
+
+USES INCLUDE HEADER: loop_device.hxx
+INCLUDES HEADER: setup_eos.hxx IN setup_eos.hxx
 INCLUDES HEADER: eos_utils.hxx IN eos_utils.hxx
 INCLUDES HEADER: eos.hxx IN eos.hxx
 INCLUDES HEADER: eos_1p.hxx IN eos_1p.hxx
