@@ -16,8 +16,7 @@ public:
   CCTK_REAL gamma;  // FIXME: get rid of this
   range rgeps;
 
-  // Constructor
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline  eos_tabulated3d(
+  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void init(
     const range &rgeps_, const range &rgrho_, const range &rgye_)
   {
     set_range_rho(rgrho_);
@@ -26,11 +25,6 @@ public:
     // For now, as dummy, we pass range of eps as range of temp
     set_range_temp(rgeps_);
   }
-
-
-  // Destructor
-  //CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline ~eos_tabulated3d();
-
 
   // Routine reading the EOS table and filling the corresponding object
   CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void read_eos_table(const string &filename) {

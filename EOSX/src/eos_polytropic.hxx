@@ -28,18 +28,12 @@ class eos_polytrope : public eos_1p {
   CCTK_REAL invn;       ///< \f$ \frac{1}{n} \f$
   CCTK_REAL rho_p;      ///< Weird polytropic density scal \f$ rho_p \f$
 
+public:
+
   CCTK_DEVICE CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline void
   init(CCTK_REAL poly_gamma_, ///< Adiabatic index \f$ n \f$
        CCTK_REAL poly_k_,     ///< Density scale \f$ K \f$
        CCTK_REAL rho_max_     ///< Max valid density
-  );
-
-public:
-  /// Constructor
-  CCTK_DEVICE CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_polytrope(
-      CCTK_REAL poly_gamma_, ///< Adiabatic exponent \f$ \Gamma \f$
-      CCTK_REAL poly_k_,     ///< Density scale \f$ K \f$
-      CCTK_REAL rho_max_     ///< Max valid density
   );
 
   CCTK_DEVICE CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
@@ -70,12 +64,6 @@ eos_polytrope::init(
   invn       = 1.0 / n;
   rho_p      = pow(poly_k, -n);
   // set_ranges(range(0, rho_max_));
-}
-
-CCTK_DEVICE
-CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_polytrope::eos_polytrope(
-    CCTK_REAL poly_gamma_, CCTK_REAL poly_k_, CCTK_REAL rho_max_) {
-  init(poly_gamma_, poly_k_, rho_max_);
 }
 
 CCTK_DEVICE CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL

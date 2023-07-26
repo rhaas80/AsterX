@@ -13,13 +13,9 @@ public:
   CCTK_REAL gamma, gm1, temp_over_eps;
   range rgeps;
 
-  // constructor
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_idealgas(
+  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void init(
       CCTK_REAL gamma_, CCTK_REAL umass_, const range &rgeps_,
       const range &rgrho_, const range &rgye_);
-
-  // destructor
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline ~eos_idealgas();
 
   CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
   press_from_valid_rho_eps_ye(
@@ -89,12 +85,10 @@ public:
   ) const;
 };
 
-// constructor
 CCTK_HOST
-CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_idealgas::eos_idealgas(
+CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void eos_idealgas::init(
     CCTK_REAL gamma_, CCTK_REAL umass_, const range &rgeps_,
-    const range &rgrho_, const range &rgye_)
-    : gamma(gamma_), gm1(gamma_ - 1), rgeps(rgeps_) {
+    const range &rgrho_, const range &rgye_) {
   if (gamma < 1) {
     assert(0);
     // runtime_error("EOS_IdealGas: initialized with gamma < 1");
@@ -108,10 +102,6 @@ CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_idealgas::eos_idealgas(
   temp_over_eps = gm1 * umass_;
   set_range_temp(range(temp_over_eps * rgeps.min, temp_over_eps * rgeps.max));
 }
-
-// destructor
-CCTK_HOST CCTK_DEVICE
-    CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_idealgas::~eos_idealgas() {}
 
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
 eos_idealgas::press_from_valid_rho_eps_ye(const CCTK_REAL rho,
