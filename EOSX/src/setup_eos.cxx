@@ -78,6 +78,7 @@ extern "C" void EOSX_Setup_EOS(CCTK_ARGUMENTS) {
     const string eos_filename = EOSTable_filename;
     eos_tab3d = (eos_tabulated3d*)The_Arena()->alloc(sizeof *eos_tab3d);
     assert(eos_tab3d);
+    (*eos_tab3d).init(rgeps, rgrho, rgye);
     (*eos_tab3d).read_eos_table(eos_filename);
     break;
   }
