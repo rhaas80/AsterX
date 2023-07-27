@@ -18,6 +18,11 @@ extern "C" void Tests2D_Initialize(CCTK_ARGUMENTS) {
   DECLARE_CCTK_ARGUMENTSX_Tests2D_Initialize;
   DECLARE_CCTK_PARAMETERS;
 
+  if (not CCTK_EQUALS(evol_eos_name, "IdealGas")) {
+    CCTK_VERROR("Invalid evolution EOS type '%s'. Please, set EOSX::evol_eos_name = \"IdealGas\" in your parameter file.",
+                evol_eos_name);
+  }
+
   const CCTK_REAL dummy_ye = 0.5;
 
   // See Cipolletta et al (2020) and Del Zanna, Bucciantini, Londrillo (2003)
