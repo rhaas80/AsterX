@@ -12,6 +12,7 @@
 
 #include "eos.hxx"
 #include "eos_idealgas.hxx"
+#include "eos_hybrid.hxx"
 #include "eos_tabulated3d.hxx"
 
 
@@ -22,6 +23,7 @@ extern AMREX_GPU_MANAGED eos_polytrope *eos_poly;
 
 // evolution EOS
 extern AMREX_GPU_MANAGED eos_idealgas    *eos_ig;
+extern AMREX_GPU_MANAGED eos_hybrid      *eos_hyb;
 extern AMREX_GPU_MANAGED eos_tabulated3d *eos_tab3d;
 
 } // namespace EOSX
