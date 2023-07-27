@@ -66,7 +66,6 @@ public:
     #ifdef H5_HAVE_PARALLEL
     CHECK_ERROR(H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_COLLECTIVE));
     #else
-    //CHECK_ERROR(H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_INDEPENDENT));
     dxpl_id = H5P_DEFAULT;
     #endif
 

@@ -69,6 +69,7 @@ struct eos_status {
 
 
 // A map linking HDF5 actual I/O modes to appropriate descriptive strings
+#ifdef H5_HAVE_PARALLEL
 const std::unordered_map<H5D_mpio_actual_io_mode_t, std::string> H5D_mpio_actual_io_mode_map {
     {H5D_MPIO_NO_COLLECTIVE,         "H5D_MPIO_NO_COLLECTIVE"},
     {H5D_MPIO_CHUNK_INDEPENDENT,     "H5D_MPIO_CHUNK_INDEPENDENT"},
@@ -99,7 +100,7 @@ const std::unordered_map<uint32_t, std::string> H5Pget_mpio_no_collective_cause_
     {H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE, "H5D_MPIO_ERROR_WHILE_CHECKING_COLLECTIVE_POSSIBLE"},
     {H5D_MPIO_NO_COLLECTIVE_MAX_CAUSE,                  "H5D_MPIO_NO_COLLECTIVE_MAX_CAUSE"}
 };
-
+#endif  // H5_HAVE_PARALLEL
 
 } // namespace EOSX
 
