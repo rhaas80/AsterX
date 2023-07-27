@@ -106,6 +106,8 @@ public:
 
   // Routine reading the EOS table and filling the corresponding object
   CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline void read_eos_table(const string &filename) {
+    CCTK_VINFO("Reading EOS table '%s'", filename.c_str());
+
     auto fapl_id = H5Pcreate(H5P_FILE_ACCESS);
     assert(fapl_id >= 0);
     hid_t file_id = 0;
@@ -131,8 +133,7 @@ public:
     nrho  = get_hdf5_simple_int(file_id, "pointsrho");
     nye   = get_hdf5_simple_int(file_id, "pointsye");
 
-    // TODO: remove
-    CCTK_VINFO("ntemp, nrho, nye = %d, %d, %d", ntemp, nrho, nye);
+    CCTK_VINFO("EOS table dimensions: ntemp = %d, nrho = %d, nye = %d", ntemp, nrho, nye);
 
     CHECK_ERROR(H5Pclose(fapl_id));
 
