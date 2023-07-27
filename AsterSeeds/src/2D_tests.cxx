@@ -19,7 +19,6 @@ extern "C" void Tests2D_Initialize(CCTK_ARGUMENTS) {
   DECLARE_CCTK_PARAMETERS;
 
   const CCTK_REAL dummy_ye = 0.5;
-  auto* eos_ig_ptr = eos_ig;
 
   // See Cipolletta et al (2020) and Del Zanna, Bucciantini, Londrillo (2003)
   if (CCTK_EQUALS(test_case, "magnetic rotor")) {
@@ -44,8 +43,7 @@ extern "C" void Tests2D_Initialize(CCTK_ARGUMENTS) {
           }
 
           press(p.I) = 1.;
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<1, 0, 0>(
@@ -92,8 +90,7 @@ extern "C" void Tests2D_Initialize(CCTK_ARGUMENTS) {
         [=] CCTK_DEVICE(const PointDesc &p) CCTK_ATTRIBUTE_ALWAYS_INLINE {
           rho(p.I) = 1.;
           press(p.I) = 3.;
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
           velx(p.I) = 1. / 12.0;
           vely(p.I) = 1. / 24.;
           velz(p.I) = axial_vel;
@@ -161,8 +158,7 @@ extern "C" void Tests2D_Initialize(CCTK_ARGUMENTS) {
             vely(p.I) = 0.0;
             velz(p.I) = 0.0;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<1, 0, 0>(

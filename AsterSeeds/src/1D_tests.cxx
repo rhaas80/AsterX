@@ -19,7 +19,6 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
   DECLARE_CCTK_PARAMETERS;
 
   const CCTK_REAL dummy_ye = 0.5;
-  auto* eos_ig_ptr = eos_ig;
 
   if (CCTK_EQUALS(test_case, "equilibrium")) {
 
@@ -31,8 +30,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
           vely(p.I) = 0.0;
           velz(p.I) = 0.0;
           press(p.I) = 1.0;
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<1, 0, 0>(
@@ -59,8 +57,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
           vely(p.I) = 0.0;
           velz(p.I) = 0.0;
           press(p.I) = 1.0; // should add kinetic energy here
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<1, 0, 0>(
@@ -95,8 +92,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             velz(p.I) = 0.0;
             press(p.I) = 1.0;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<1, 0, 0>(
@@ -153,8 +149,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             velz(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<1, 0, 0>(
@@ -205,8 +200,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             velx(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<0, 1, 0>(
@@ -256,8 +250,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             vely(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<0, 0, 1>(
@@ -322,8 +315,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             velz(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<1, 0, 0>(
@@ -374,8 +366,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             velx(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<0, 1, 0>(
@@ -425,8 +416,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             vely(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<0, 0, 1>(
@@ -491,8 +481,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             velz(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<1, 0, 0>(
@@ -543,8 +532,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             velx(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<0, 1, 0>(
@@ -594,8 +582,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             vely(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<0, 0, 1>(
@@ -660,8 +647,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             velz(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<1, 0, 0>(
@@ -712,8 +698,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             velx(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<0, 1, 0>(
@@ -763,8 +748,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             vely(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<0, 0, 1>(
@@ -829,8 +813,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             velz(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<1, 0, 0>(
@@ -881,8 +864,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             velx(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<0, 1, 0>(
@@ -932,8 +914,7 @@ extern "C" void Tests1D_Initialize(CCTK_ARGUMENTS) {
             vely(p.I) = vzr;
             press(p.I) = pressr;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<0, 0, 1>(

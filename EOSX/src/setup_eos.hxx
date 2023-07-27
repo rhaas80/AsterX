@@ -4,6 +4,7 @@
 #include <cctk.h>
 #include <cctk_Arguments.h>
 #include <cctk_Parameters.h>
+
 #include <AMReX.H>
 
 #include "eos_1p.hxx"
@@ -13,14 +14,15 @@
 #include "eos_idealgas.hxx"
 #include "eos_tabulated3d.hxx"
 
+
 namespace EOSX {
 
 // initial data EOS
-extern eos_polytrope* eos_poly;
+extern AMREX_GPU_MANAGED eos_polytrope *eos_poly;
 
 // evolution EOS
-extern eos_idealgas* eos_ig;
-extern eos_tabulated3d* eos_tab3d;
+extern AMREX_GPU_MANAGED eos_idealgas    *eos_ig;
+extern AMREX_GPU_MANAGED eos_tabulated3d *eos_tab3d;
 
 } // namespace EOSX
 

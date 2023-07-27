@@ -19,7 +19,6 @@ extern "C" void Tests3D_Initialize(CCTK_ARGUMENTS) {
   DECLARE_CCTK_PARAMETERS;
 
   const CCTK_REAL dummy_ye = 0.5;
-  auto* eos_ig_ptr = eos_ig;
 
   if (CCTK_EQUALS(test_case, "spherical shock")) {
 
@@ -40,8 +39,7 @@ extern "C" void Tests3D_Initialize(CCTK_ARGUMENTS) {
             velz(p.I) = 0.0;
             press(p.I) = 1.0;
           }
-          eps(p.I) = eos_ig_ptr->eps_from_valid_rho_press_ye(rho(p.I), press(p.I),
-                                                        dummy_ye);
+          eps(p.I) = eos_ig->eps_from_valid_rho_press_ye(rho(p.I), press(p.I), dummy_ye);
         });
 
     grid.loop_all_device<1, 0, 0>(
