@@ -230,7 +230,7 @@ eos_hybrid::entropy_from_valid_rho_temp_ye(const CCTK_REAL rho,
                                              const CCTK_REAL temp,
                                              const CCTK_REAL ye) const {
   //return log(temp * pow(rho, -gm1_th) / temp_over_eps);
-  throw logic_error("EOS: entropy from temperature not implemented for EOS_Thermal_Hybrid.");
+  throw logic_error("EOS: entropy from temperature not implemented for eos_hybrid.");
 }
 
 // edited
@@ -247,7 +247,8 @@ CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
 eos_hybrid::eps_from_valid_rho_temp_ye(const CCTK_REAL rho,
                                          const CCTK_REAL temp,
                                          const CCTK_REAL ye) const {
-  return temp / temp_over_eps;
+  //return temp / temp_over_eps;
+  throw logic_error("EOS: eps from temperature not implemented for eos_hybrid.");
 }
 
 // edited
