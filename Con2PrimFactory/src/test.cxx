@@ -27,8 +27,8 @@ extern "C" void Con2PrimFactory_Test(CCTK_ARGUMENTS) {
                              1.0, 0.0, 1.0}; // xx, xy, xz, yy, yz, zz
 
   // Con2Prim objects
-  c2p_2DNoble c2p_Noble(eos_ig.data()[0], 100, 1e-8);
-  c2p_1DPalenzuela c2p_Pal(eos_ig.data()[0], 100, 1e-8);
+  c2p_2DNoble c2p_Noble(*eos_ig, 100, 1e-8);
+  c2p_1DPalenzuela c2p_Pal(*eos_ig, 100, 1e-8);
 
   prim_vars pv;
   // rho(p.I), eps(p.I), dummy_Ye, press(p.I),v_up, wlor, Bup
@@ -45,7 +45,7 @@ extern "C" void Con2PrimFactory_Test(CCTK_ARGUMENTS) {
 
   // Testing C2P Noble
   CCTK_VINFO("Testing C2P Noble...");
-  c2p_Noble.solve(eos_ig.data()[0], pv, pv_seeds, cv, g, c2p_succeeded_Noble);
+  c2p_Noble.solve(*eos_ig, pv, pv_seeds, cv, g, c2p_succeeded_Noble);
 
   printf("pv_seeds, pv: \n"
          "rho: %f, %f \n"
@@ -86,7 +86,7 @@ extern "C" void Con2PrimFactory_Test(CCTK_ARGUMENTS) {
 
   // Testing C2P Palenzuela
   CCTK_VINFO("Testing C2P Palenzuela...");
-  c2p_Pal.solve(eos_ig.data()[0], pv, pv_seeds, cv, g, c2p_succeeded_Pal);
+  c2p_Pal.solve(*eos_ig, pv, pv_seeds, cv, g, c2p_succeeded_Pal);
 
   printf("pv_seeds, pv: \n"
          "rho: %f, %f \n"

@@ -16,12 +16,11 @@
 namespace EOSX {
 
 // initial data EOS
-extern amrex::AsyncArray<eos_polytrope> eos_poly;
+extern eos_polytrope* eos_poly;
 
 // evolution EOS
-extern amrex::AsyncArray<eos_idealgas> eos_ig;
-
-extern amrex::AsyncArray<eos_tabulated3d> eos_tab3d;
+extern eos_idealgas* eos_ig;
+extern eos_tabulated3d* eos_tab3d;
 
 } // namespace EOSX
 
