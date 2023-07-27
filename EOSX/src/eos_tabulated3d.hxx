@@ -8,8 +8,6 @@
 #include "eos.hxx"
 #include <string>
 
-//#include <AMReX.H>
-
 using namespace std;
 
 namespace EOSX {
@@ -20,8 +18,6 @@ public:
   range rgeps;
   
   CCTK_INT ntemp, nrho, nye;
-//  amrex::Vector<CCTK_REAL> logtemp, logrho, ye;
-  
 
   CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void init(
     const range &rgeps_, const range &rgrho_, const range &rgye_)
@@ -32,6 +28,81 @@ public:
     // For now, as dummy, we pass range of eps as range of temp
     set_range_temp(rgeps_);
   }
+
+
+  // Routine reading an HDF5 simple dataset consisting of one integer element
+  // FIXME: make this more general: any type (template), any number of elements (but still 1D-shaped)
+  CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline
+  CCTK_INT get_hdf5_simple_int(const hid_t  &file_id,
+                               const string &dset_name) {
+    const auto dset_id = H5Dopen(file_id, dset_name.c_str(), H5P_DEFAULT);
+    assert(dset_id >= 0);
+
+    const auto dspace_id = H5Dget_space(dset_id);
+    assert(dspace_id >= 0);
+
+    const auto dspacetype_id = H5Sget_simple_extent_type(dspace_id);
+    assert(dspacetype_id == H5S_SIMPLE);
+
+    const auto ndims = H5Sget_simple_extent_ndims(dspace_id);
+    assert(ndims == 1);
+
+    hsize_t size;
+    const auto ndims_again = H5Sget_simple_extent_dims(dspace_id, &size, nullptr);
+    CHECK_ERROR(H5Sclose(dspace_id));
+    assert(ndims_again == 1);
+    assert(size        == 1);
+
+    const auto dtype_id = H5Dget_type(dset_id);
+    assert(dtype_id >= 0);
+
+    const auto dtypeclass = H5Tget_class(dtype_id);
+    assert(dtypeclass == H5T_INTEGER);
+    CHECK_ERROR(H5Tclose(dtype_id));
+
+    auto dxpl_id = H5Pcreate(H5P_DATASET_XFER);
+    assert(dxpl_id >= 0);
+
+    #ifdef H5_HAVE_PARALLEL
+    CHECK_ERROR(H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_COLLECTIVE));
+    #else
+    CHECK_ERROR(H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_INDEPENDENT));
+    #endif
+
+    CCTK_INT buffer;
+    CHECK_ERROR(H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, dxpl_id, &buffer));
+    CHECK_ERROR(H5Dclose(dset_id));
+
+    #ifdef H5_HAVE_PARALLEL
+    H5D_mpio_actual_io_mode_t actual_io_mode;
+    CHECK_ERROR(H5Pget_mpio_actual_io_mode(dxpl_id, &actual_io_mode));
+
+    H5D_mpio_actual_chunk_opt_mode_t actual_chunk_opt_mode;
+    CHECK_ERROR(H5Pget_mpio_actual_chunk_opt_mode(dxpl_id, &actual_chunk_opt_mode));
+
+    uint32_t no_collective_cause_local, no_collective_cause_global;
+    CHECK_ERROR(H5Pget_mpio_no_collective_cause(dxpl_id,
+                &no_collective_cause_local, &no_collective_cause_global));
+
+    if (actual_io_mode             == H5D_MPIO_NO_COLLECTIVE         or
+        //actual_chunk_opt_mode      == H5D_MPIO_NO_CHUNK_OPTIMIZATION or  // In general, input files are not chunked
+        no_collective_cause_local  != H5D_MPIO_COLLECTIVE            or
+        no_collective_cause_global != H5D_MPIO_COLLECTIVE)
+    {
+        CCTK_VWARN(1, "Actual I/O mode, chunk optimization and local and global non-collective I/O causes when reading data from dataset '%s': '%s', '%s', '%s', '%s'",
+                   H5D_mpio_actual_io_mode_map.at(actual_io_mode).c_str(),
+                   H5D_mpio_actual_chunk_opt_mode_map.at(actual_chunk_opt_mode).c_str(),
+                   H5Pget_mpio_no_collective_cause_map.at(no_collective_cause_local).c_str(),
+                   H5Pget_mpio_no_collective_cause_map.at(no_collective_cause_global).c_str(),
+                   dset_name.c_str());
+    }
+    #endif  // H5_HAVE_PARALLEL
+
+    CHECK_ERROR(H5Pclose(dxpl_id));
+    return buffer;
+  }
+
+
 
   // Routine reading the EOS table and filling the corresponding object
   CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline void read_eos_table(const string &filename) {
@@ -55,7 +126,13 @@ public:
 
     assert(file_id >= 0);
 
-    // TODO: actually read the EOS table and fill the EOS object
+    // TODO: finish reading the EOS table and filling the EOS object
+    ntemp = get_hdf5_simple_int(file_id, "pointstemp");
+    nrho  = get_hdf5_simple_int(file_id, "pointsrho");
+    nye   = get_hdf5_simple_int(file_id, "pointsye");
+
+    // TODO: remove
+    CCTK_VINFO("ntemp, nrho, nye = %d, %d, %d", ntemp, nrho, nye);
 
     CHECK_ERROR(H5Pclose(fapl_id));
 
