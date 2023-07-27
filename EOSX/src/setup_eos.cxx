@@ -19,6 +19,7 @@ AMREX_GPU_MANAGED eos_polytrope *eos_poly = nullptr;
 
 // evolution EOS
 AMREX_GPU_MANAGED eos_idealgas    *eos_ig    = nullptr;
+AMREX_GPU_MANAGED eos_hybrid      *eos_hyb    = nullptr;
 AMREX_GPU_MANAGED eos_tabulated3d *eos_tab3d = nullptr;
 
 
@@ -76,7 +77,9 @@ extern "C" void EOSX_Setup_EOS(CCTK_ARGUMENTS) {
     break;
   }
   case eos_evol::Hybrid: {
-    CCTK_ERROR("Hybrid EOS is not yet supported");
+    eos_hyb = (eos_hybrid*)The_Managed_Arena()->alloc(sizeof *eos_hyb);
+    new (eos_hyb) eos_hybrid(eos_poly, gamma_th, rgeps, rgrho, rgye);
+    assert(eos_hyb);
     break;
   }
   case eos_evol::Tabulated: {

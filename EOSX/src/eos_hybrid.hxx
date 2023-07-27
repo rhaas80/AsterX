@@ -1,8 +1,8 @@
 /* file eos_hybrid.hxx
- * child class of eos, implements hybrid EoS given barotropic EoS from eos_1p.hxx
- * added by Johnny Tsao btsao@utexas.edu
- * hybrid EoS following the convention in thcextra/EOS_Thermal_Hybrid/src/eos_hybrid.h
- * by Wolfgang Kastaun physik@fangwolg.de
+ * child class of eos, implements hybrid EoS given barotropic EoS from
+ * eos_1p.hxx added by Johnny Tsao btsao@utexas.edu hybrid EoS following the
+ * convention in thcextra/EOS_Thermal_Hybrid/src/eos_hybrid.h by Wolfgang
+ * Kastaun physik@fangwolg.de
  */
 
 #ifndef EOS_HYBRID_HXX
@@ -13,100 +13,25 @@
 #include <cmath>
 
 #include "eos.hxx"
+#include "eos_polytropic.hxx"
 
-#include "eos_1p.hxx"
 using namespace std;
 
 namespace EOSX {
 
 class eos_hybrid : public eos {
 public:
-  //CCTK_REAL gamma_th, gm1, temp_over_eps;
-  CCTK_REAL gamme_th,gm1_th; //TODO: temp_over_eps
+  // CCTK_REAL gamma_th, gm1, temp_over_eps;
+  CCTK_REAL gamma; //dummy
+  CCTK_REAL gamma_th, gm1_th; // TODO: temp_over_eps
   range rgeps;
-  eos_1p eos_c;
-
-  // constructor
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_hybrid(
-      CCTK_REAL gamma_, CCTK_REAL umass_, const range &rgeps_,
-      const range &rgrho_, const range &rgye_);
-
-  // destructor
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline ~eos_idealgas();
-
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-  press_from_valid_rho_eps_ye(
-      const CCTK_REAL rho, ///< Rest mass density  \f$ \rho \f$
-      const CCTK_REAL eps, ///< Specific internal energy \f$ \epsilon \f$
-      const CCTK_REAL ye   ///< Electron fraction \f$ Y_e \f$
-  ) const;
-
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-  eps_from_valid_rho_press_ye(
-      const CCTK_REAL rho,   ///< Rest mass density  \f$ \rho \f$
-      const CCTK_REAL press, ///< Pressure \f$ P \f$
-      const CCTK_REAL ye     ///< Electron fraction \f$ Y_e \f$
-  ) const;
-
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-  csnd_from_valid_rho_eps_ye(
-      const CCTK_REAL rho, ///< Rest mass density  \f$ \rho \f$
-      const CCTK_REAL eps, ///< Specific internal energy \f$ \epsilon \f$
-      const CCTK_REAL ye   ///< Electron fraction \f$ Y_e \f$
-  ) const;
-
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-  temp_from_valid_rho_eps_ye(
-      const CCTK_REAL rho, ///< Rest mass density  \f$ \rho \f$
-      const CCTK_REAL eps, ///< Specific internal energy \f$ \epsilon \f$
-      const CCTK_REAL ye   ///< Electron fraction \f$ Y_e \f$
-  ) const;
-
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void
-  press_derivs_from_valid_rho_eps_ye(
-      CCTK_REAL &press,  ///< Pressure \f$ P \f$
-      CCTK_REAL &dpdrho, ///< Partial derivative \f$ \frac{\partial P}{\partial
-                         ///< \rho} \f$
-      CCTK_REAL &dpdeps, ///< Partial derivative \f$ \frac{\partial P}{\partial
-                         ///< \epsilon} \f$
-      const CCTK_REAL rho, ///< Rest mass density  \f$ \rho \f$
-      const CCTK_REAL eps, ///< Specific internal energy \f$ \epsilon \f$
-      const CCTK_REAL ye   ///< Electron fraction \f$ Y_e \f$
-  ) const;
-
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-  entropy_from_valid_rho_temp_ye(
-      const CCTK_REAL rho,  ///< Rest mass density  \f$ \rho \f$
-      const CCTK_REAL temp, ///< Temperature \f$ T \f$
-      const CCTK_REAL ye    ///< Electron fraction \f$ Y_e \f$
-  ) const;
-
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-  entropy_from_valid_rho_eps_ye(
-      const CCTK_REAL rho, ///< Rest mass density  \f$ \rho \f$
-      const CCTK_REAL eps, ///< Specific internal energy \f$ \epsilon \f$
-      const CCTK_REAL ye   ///< Electron fraction \f$ Y_e \f$
-  ) const;
-
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-  eps_from_valid_rho_temp_ye(
-      const CCTK_REAL rho,  ///< Rest mass density  \f$ \rho \f$
-      const CCTK_REAL temp, ///< Temperature \f$ T \f$ in MeV
-      const CCTK_REAL ye    ///< Electron fraction \f$ Y_e \f$
-  ) const;
-
-  CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline range
-  range_eps_from_valid_rho_ye(
-      const CCTK_REAL rho, ///< Rest mass density  \f$ \rho \f$
-      const CCTK_REAL ye   ///< Electron fraction \f$ Y_e \f$
-  ) const;
-};
+  eos_polytrope* eos_c;
 
 // constructor
 CCTK_HOST
-CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_hybrid::eos_hybrid(
-    CCTK_REAL umass_, const range &rgeps_,
-  eos_1p& eos_c_,  CCTK_REAL gamma_th_, const range& rgrho_, const range& rgeps_, const range& rgye_)
+CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_hybrid(
+    eos_polytrope *eos_c_, CCTK_REAL gamma_th_, range &rgrho_,
+    range &rgeps_, range &rgye_)
     : eos_c(eos_c_), gamma_th(gamma_th_), rgeps(rgeps_) {
 
   if (gamma_th < 1) {
@@ -116,148 +41,150 @@ CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_hybrid::eos_hybrid(
   if (gamma_th > 2) { // Ensure subluminal Soundspeed and P < E
     rgeps.max = min(rgeps.max, 1 / (gamma_th * (gamma_th - 2)));
   }
-  
-  //temp_over_eps = gm1 * umass_; // TODO: temp_over_eps = (gamma - 1) * u_mass, write in no gamma form
+
+  // temp_over_eps = gm1 * umass_; // TODO: temp_over_eps = (gamma - 1) *
+  // u_mass, write in no gamma form
 
   gm1_th = gamma_th - 1.0;
   set_range_rho(rgrho_);
   set_range_ye(rgye_);
-  //set_range_temp(range(temp_over_eps * rgeps.min, temp_over_eps * rgeps.max));
-  set_range_temp(range(0,0)); //TODO: Implement temperature;
+  // set_range_temp(range(temp_over_eps * rgeps.min, temp_over_eps *
+  // rgeps.max));
+  set_range_temp(range(0, 0)); // TODO: Implement temperature;
 }
 // ranges found with {rho, eps, ye} instead of {rho, temp ye}
 // range for rho can be replaced with {0, rho_max}
 
-
-// destructor
-CCTK_HOST CCTK_DEVICE
-    CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos_hybrid::~eos_hybrid() {}
-
 // edited
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-eos_hybrid::eps_cold(const CCTK_REAL rho) const {
-  CCTK_REAL gm1  = eos_c.gm1_from_valid_rho(rho); //TODO: name change -> gm1 here is hm1
-  return eos_c.sed_from_valid_gm1(gm1);
+eps_cold(const CCTK_REAL rho) const {
+  CCTK_REAL gm1 =
+      eos_c->gm1_from_valid_rho(rho); // TODO: name change -> gm1 here is hm1
+  return eos_c->sed_from_valid_gm1(gm1);
 }
 
 // edited
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-eos_hybrid::p_cold(const CCTK_REAL rho) const {
-  CCTK_REAL gm1  = eos_c.gm1_from_valid_rho(rho); //TODO: name change -> gm1 here is hm1
-  return eos_c.p_from_valid_gm1(gm1);
+p_cold(const CCTK_REAL rho) const {
+  CCTK_REAL gm1 =
+      eos_c->gm1_from_valid_rho(rho); // TODO: name change -> gm1 here is hm1
+  return eos_c->p_from_valid_gm1(gm1);
 }
 
 // edited
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-eos_hybrid::hm1_cold(const CCTK_REAL rho) const {
-  CCTK_REAL gm1  = eos_c.gm1_from_valid_rho(rho); //TODO: name change -> gm1 here is hm1
-  return eos_c.hm1_from_valid_gm1(gm1);
+hm1_cold(const CCTK_REAL rho) const {
+  CCTK_REAL gm1 =
+      eos_c->gm1_from_valid_rho(rho); // TODO: name change -> gm1 here is hm1
+  return eos_c->hm1_from_valid_gm1(gm1);
 }
 
 // edited
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-eos_hybrid::cs2_cold(const CCTK_REAL rho) const {
-  CCTK_REAL gm1  = eos_c.gm1_from_valid_rho(rho); //TODO: name change -> gm1 here is hm1
-  return eos_c.cs2nd_from_valid_gm1(gm1);
+cs2_cold(const CCTK_REAL rho) const {
+  CCTK_REAL gm1 =
+      eos_c->gm1_from_valid_rho(rho); // TODO: name change -> gm1 here is hm1
+  return eos_c->csnd2_from_valid_gm1(gm1);
 }
 
 // edited
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-eos_hybrid::press_from_valid_rho_eps_ye(const CCTK_REAL rho,
-                                          const CCTK_REAL eps,
-                                          const CCTK_REAL ye) const {
-  CCTK_REAL p_c   = p_cold(rho);
+press_from_valid_rho_eps_ye(const CCTK_REAL rho,
+                                        const CCTK_REAL eps,
+                                        const CCTK_REAL ye) const {
+  CCTK_REAL p_c = p_cold(rho);
   CCTK_REAL eps_c = eps_cold(rho);
-  CCTK_REAL p_th  = gm1_th * rho * (eps - eps_c);
+  CCTK_REAL p_th = gm1_th * rho * (eps - eps_c);
   return p_c + p_th;
 }
 
 // this is not in thc, TODO: check if correct
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-eos_hybrid::eps_from_valid_rho_press_ye(const CCTK_REAL rho,
-                                          const CCTK_REAL press,
-                                          const CCTK_REAL ye) const {
-  CCTK_REAL p_c    = p_cold(rho);
+eps_from_valid_rho_press_ye(const CCTK_REAL rho,
+                                        const CCTK_REAL press,
+                                        const CCTK_REAL ye) const {
+  CCTK_REAL p_c = p_cold(rho);
   CCTK_REAL eps_c = eps_cold(rho);
-  CCTK_REAL p_th   = press - p_c;
+  CCTK_REAL p_th = press - p_c;
   CCTK_REAL eps_th = p_th / gm1_th / rho;
   return eps_c + eps_th;
 }
 
 // edited
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-eos_hybrid::csnd_from_valid_rho_eps_ye(const CCTK_REAL rho,
-                                          const CCTK_REAL eps,
-                                          const CCTK_REAL ye) const {
-  CCTK_REAL cs2_c   = cs2_cold(rho);
-  CCTK_REAL eps_c   = eps_cold(rho);
-  CCTK_REAL h_c     = 1.0 + hm1_cold(rho);
-  CCTK_REAL eps_th  = eps - eps_c;
-  CCTK_REAL h_th    = gamma_th * eps_th;
-  CCTK_REAL w       = h_th / (h_c + h_th);
-  CCTK_REAL cs2     = (1.0 - w) * cs2_c + w * gm1_th;
+csnd_from_valid_rho_eps_ye(const CCTK_REAL rho, const CCTK_REAL eps,
+                                       const CCTK_REAL ye) const {
+  CCTK_REAL cs2_c = cs2_cold(rho);
+  CCTK_REAL eps_c = eps_cold(rho);
+  CCTK_REAL h_c = 1.0 + hm1_cold(rho);
+  CCTK_REAL eps_th = eps - eps_c;
+  CCTK_REAL h_th = gamma_th * eps_th;
+  CCTK_REAL w = h_th / (h_c + h_th);
+  CCTK_REAL cs2 = (1.0 - w) * cs2_c + w * gm1_th;
   return sqrt(cs2);
 }
 
 // temperature is not yet implemented in thc
-CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-eos_hybrid::temp_from_valid_rho_eps_ye(const CCTK_REAL rho,
-                                         const CCTK_REAL eps,
-                                         const CCTK_REAL ye) const {
-  //return temp_over_eps * eps;
-  throw runtime_error("eos_hybrid: temperature not implemented");
+CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void
+temp_from_valid_rho_eps_ye(const CCTK_REAL rho, const CCTK_REAL eps,
+                                       const CCTK_REAL ye) const {
+  // return temp_over_eps * eps;
+  printf("eos_hybrid: temperature not implemented");
 }
 
 // edited
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void
-eos_hybrid::press_derivs_from_valid_rho_eps_ye(
+press_derivs_from_valid_rho_eps_ye(
     CCTK_REAL &press, CCTK_REAL &dpdrho, CCTK_REAL &dpdeps, const CCTK_REAL rho,
     const CCTK_REAL eps, const CCTK_REAL ye) const {
-  CCTK_REAL p_c     = p_cold(rho);
-  CCTK_REAL cs2_c   = cs2_cold(rho);
-  CCTK_REAL eps_c   = eps_cold(rho);
-  CCTK_REAL h_c     = 1.0 + hm1_cold(rho);
-  CCTK_REAL eps_th  = eps - eps_c;
-  CCTK_REAL p_th    = gm1_th * rho * eps_th;
-  press             = p_c + p_th;
-  dpdrho            = h_c * cs2_c + gm1_th * (eps_th - p_c / rho);
-  dpdeps            = gm1_th * rho;
+  CCTK_REAL p_c = p_cold(rho);
+  CCTK_REAL cs2_c = cs2_cold(rho);
+  CCTK_REAL eps_c = eps_cold(rho);
+  CCTK_REAL h_c = 1.0 + hm1_cold(rho);
+  CCTK_REAL eps_th = eps - eps_c;
+  CCTK_REAL p_th = gm1_th * rho * eps_th;
+  press = p_c + p_th;
+  dpdrho = h_c * cs2_c + gm1_th * (eps_th - p_c / rho);
+  dpdeps = gm1_th * rho;
 }
 
 // edited
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-eos_hybrid::entropy_from_valid_rho_temp_ye(const CCTK_REAL rho,
-                                             const CCTK_REAL temp,
-                                             const CCTK_REAL ye) const {
-  //return log(temp * pow(rho, -gm1_th) / temp_over_eps);
-  throw logic_error("EOS: entropy from temperature not implemented for eos_hybrid.");
+entropy_from_valid_rho_temp_ye(const CCTK_REAL rho,
+                                           const CCTK_REAL temp,
+                                           const CCTK_REAL ye) const {
+  // return log(temp * pow(rho, -gm1_th) / temp_over_eps);
+  throw logic_error(
+      "EOS: entropy from temperature not implemented for eos_hybrid.");
 }
 
 // edited
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-eos_hybrid::entropy_from_valid_rho_eps_ye(const CCTK_REAL rho,
-                                            const CCTK_REAL eps,
-                                            const CCTK_REAL ye) const {
+entropy_from_valid_rho_eps_ye(const CCTK_REAL rho,
+                                          const CCTK_REAL eps,
+                                          const CCTK_REAL ye) const {
   CCTK_REAL eps_th = eps - eps_cold(rho);
-  return log(eps_th*pow(rho, -gm1_th));
+  return log(eps_th * pow(rho, -gm1_th));
 }
 
 // edited
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
-eos_hybrid::eps_from_valid_rho_temp_ye(const CCTK_REAL rho,
-                                         const CCTK_REAL temp,
-                                         const CCTK_REAL ye) const {
-  //return temp / temp_over_eps;
-  throw logic_error("EOS: eps from temperature not implemented for eos_hybrid.");
+eps_from_valid_rho_temp_ye(const CCTK_REAL rho,
+                                       const CCTK_REAL temp,
+                                       const CCTK_REAL ye) const {
+  // return temp / temp_over_eps;
+  throw logic_error(
+      "EOS: eps from temperature not implemented for eos_hybrid.");
 }
 
 // edited
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline eos::range
-eos_hybrid::range_eps_from_valid_rho_ye(const CCTK_REAL rho,
-                                          const CCTK_REAL ye) const {
+range_eps_from_valid_rho_ye(const CCTK_REAL rho,
+                                        const CCTK_REAL ye) const {
   return rgeps;
 }
 
+};
 } // namespace EOSX
 
 #endif

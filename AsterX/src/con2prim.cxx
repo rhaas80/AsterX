@@ -217,28 +217,14 @@ extern "C" void AsterX_Con2Prim(CCTK_ARGUMENTS) {
 
   switch (eostype) {
   case eos_t::IdealGas: {
-
-    //eos_polytrope eos_cold;
-    //eos_cold.init(poly_gamma, poly_k, rho_max);
-    //eos_idealgas eos_th;
-    //eos_th.init(gl_gamma, particle_mass, rgeps, rgrho, rgye);
-
     AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, *eos_poly, *eos_ig);
     break;
   }
   case eos_t::Hybrid: {
-    CCTK_ERROR("Hybrid EOS is not yet supported");
+    AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, *eos_poly, *eos_hyb);
     break;
   }
   case eos_t::Tabulated: {
-
-    // FIXME: DON'T build the tabulated EOS object here!
-    //eos_polytrope eos_cold;
-    //eos_cold.init(poly_gamma, poly_k, rho_max);
-    //const string eos_filename = EOSTable_filename;
-    //eos_tabulated3d eos_th;
-    //eos_th.init(rgeps, rgrho, rgye);
-    //eos_th.read_eos_table(eos_filename);
     AsterX_Con2Prim_typeEoS(CCTK_PASS_CTOC, *eos_poly, *eos_tab3d);
     break;
   }

@@ -479,23 +479,18 @@ extern "C" void AsterX_Fluxes(CCTK_ARGUMENTS) {
 
   switch (eostype) {
   case eos_t::IdealGas: {
-    //eos_idealgas eos_th;
-    //eos_th.init(gl_gamma, particle_mass, rgeps, rgrho, rgye);
     CalcFlux<0>(cctkGH, *eos_ig);
     CalcFlux<1>(cctkGH, *eos_ig);
     CalcFlux<2>(cctkGH, *eos_ig);
     break;
   }
   case eos_t::Hybrid: {
-    CCTK_ERROR("Hybrid EOS is not yet supported");
+    CalcFlux<0>(cctkGH, *eos_hyb);
+    CalcFlux<1>(cctkGH, *eos_hyb);
+    CalcFlux<2>(cctkGH, *eos_hyb);
     break;
   }
   case eos_t::Tabulated: {
-    // FIXME: DON'T build the tabulated EOS object here!
-    //const string eos_filename = EOSTable_filename;
-    //eos_tabulated3d eos_th;
-    //eos_th.init(rgeps, rgrho, rgye);
-    //eos_th.read_eos_table(eos_filename);
     CalcFlux<0>(cctkGH, *eos_tab3d);
     CalcFlux<1>(cctkGH, *eos_tab3d);
     CalcFlux<2>(cctkGH, *eos_tab3d);
