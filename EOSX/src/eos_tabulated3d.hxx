@@ -7,6 +7,7 @@
 #include <mpi.h>
 #include "eos.hxx"
 #include <string>
+#include <AMReX.H>
 
 using namespace std;
 
@@ -18,6 +19,10 @@ public:
   range rgeps;
   
   CCTK_INT ntemp, nrho, nye;
+  //AMREX_GPU_MANAGED CCTK_REAL *logrho, *logtemp, *ye;
+
+  //amrex::FArrayBox logtemp, logrho, ye;
+  //amrex::Array4<CCTK_REAL> logpress, ...;
 
   CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void init(
     const range &rgeps_, const range &rgrho_, const range &rgye_)
@@ -100,6 +105,86 @@ public:
 
     CHECK_ERROR(H5Pclose(dxpl_id));
     return buffer;
+  }
+
+
+
+  // Routine reading a 1D HDF5 simple dataset storing real numbers
+  CCTK_HOST CCTK_ATTRIBUTE_ALWAYS_INLINE inline
+  void get_hdf5_simple_1Darray(const hid_t      &file_id,
+                               const string     &dset_name,
+			       amrex::FArrayBox &var) {
+    const auto dset_id = H5Dopen(file_id, dset_name.c_str(), H5P_DEFAULT);
+    assert(dset_id >= 0);
+
+    const auto dspace_id = H5Dget_space(dset_id);
+    assert(dspace_id >= 0);
+
+    const auto dspacetype_id = H5Sget_simple_extent_type(dspace_id);
+    assert(dspacetype_id == H5S_SIMPLE);
+
+    const auto ndims = H5Sget_simple_extent_ndims(dspace_id);
+    assert(ndims == 1);
+
+    hsize_t size;
+    const auto ndims_again = H5Sget_simple_extent_dims(dspace_id, &size, nullptr);
+    CHECK_ERROR(H5Sclose(dspace_id));
+    assert(ndims_again == 1);
+    assert(size > 0);
+
+    const auto dtype_id = H5Dget_type(dset_id);
+    assert(dtype_id >= 0);
+
+    const auto dtypeclass = H5Tget_class(dtype_id);
+    assert(dtypeclass == H5T_FLOAT);
+    CHECK_ERROR(H5Tclose(dtype_id));
+
+    auto dxpl_id = H5Pcreate(H5P_DATASET_XFER);
+    assert(dxpl_id >= 0);
+
+    #ifdef H5_HAVE_PARALLEL
+    CHECK_ERROR(H5Pset_dxpl_mpio(dxpl_id, H5FD_MPIO_COLLECTIVE));
+    #else
+    dxpl_id = H5P_DEFAULT;
+    #endif
+
+    CCTK_REAL buffer[size];
+    //CCTK_REAL *buffer = new CCTK_REAL[size];
+    CHECK_ERROR(H5Dread(dset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, dxpl_id, buffer));
+    CHECK_ERROR(H5Dclose(dset_id));
+
+    #ifdef H5_HAVE_PARALLEL
+    H5D_mpio_actual_io_mode_t actual_io_mode;
+    CHECK_ERROR(H5Pget_mpio_actual_io_mode(dxpl_id, &actual_io_mode));
+
+    H5D_mpio_actual_chunk_opt_mode_t actual_chunk_opt_mode;
+    CHECK_ERROR(H5Pget_mpio_actual_chunk_opt_mode(dxpl_id, &actual_chunk_opt_mode));
+
+    uint32_t no_collective_cause_local, no_collective_cause_global;
+    CHECK_ERROR(H5Pget_mpio_no_collective_cause(dxpl_id,
+                &no_collective_cause_local, &no_collective_cause_global));
+
+    if (actual_io_mode             == H5D_MPIO_NO_COLLECTIVE         or
+        //actual_chunk_opt_mode      == H5D_MPIO_NO_CHUNK_OPTIMIZATION or  // In general, input files are not chunked
+        no_collective_cause_local  != H5D_MPIO_COLLECTIVE            or
+        no_collective_cause_global != H5D_MPIO_COLLECTIVE)
+    {
+        CCTK_VWARN(1, "Actual I/O mode, chunk optimization and local and global non-collective I/O causes when reading data from dataset '%s': '%s', '%s', '%s', '%s'",
+                   H5D_mpio_actual_io_mode_map.at(actual_io_mode).c_str(),
+                   H5D_mpio_actual_chunk_opt_mode_map.at(actual_chunk_opt_mode).c_str(),
+                   H5Pget_mpio_no_collective_cause_map.at(no_collective_cause_local).c_str(),
+                   H5Pget_mpio_no_collective_cause_map.at(no_collective_cause_global).c_str(),
+                   dset_name.c_str());
+    }
+    #endif  // H5_HAVE_PARALLEL
+
+    CHECK_ERROR(H5Pclose(dxpl_id));
+
+    //amrex::Box box1d(amrex::IntVect{0, 0, 0}, amrex::IntVect{size - 1, 0, 0});
+    //var = amrex::FArrayBox(box1d, 1, amrex::The_Managed_Arena());
+    // TODO: fill var with buffer
+
+    return;
   }
 
 
