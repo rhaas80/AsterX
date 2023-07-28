@@ -26,7 +26,6 @@ AMREX_GPU_MANAGED eos_tabulated3d *eos_tab3d = nullptr;
 extern "C" void EOSX_Setup_EOSID(CCTK_ARGUMENTS) {
   DECLARE_CCTK_PARAMETERS;
   eos_id eos_id_type;
-
   if (CCTK_EQUALS(id_eos_name, "Polytropic")) {
     eos_id_type = eos_id::Polytropic;
   } else if (CCTK_EQUALS(id_eos_name, "PWPolytropic")) {
@@ -37,6 +36,7 @@ extern "C" void EOSX_Setup_EOSID(CCTK_ARGUMENTS) {
 
   switch (eos_id_type) {
     case eos_id::Polytropic: {
+      CCTK_INFO("Setting initial data EOS to Polytropic");
       eos_poly = (eos_polytrope*)The_Managed_Arena()->alloc(sizeof *eos_poly);
       new (eos_poly) eos_polytrope;
       assert(eos_poly);
@@ -70,6 +70,7 @@ extern "C" void EOSX_Setup_EOS(CCTK_ARGUMENTS) {
 
   switch (eos_evol_type) {
   case eos_evol::IdealGas: {
+    CCTK_INFO("Setting evolution EOS to Ideal Gas");
     eos_ig = (eos_idealgas*)The_Managed_Arena()->alloc(sizeof *eos_ig);
     new (eos_ig) eos_idealgas;
     assert(eos_ig);
@@ -77,12 +78,14 @@ extern "C" void EOSX_Setup_EOS(CCTK_ARGUMENTS) {
     break;
   }
   case eos_evol::Hybrid: {
+    CCTK_INFO("Setting evolution EOS to Hybrid");
     eos_hyb = (eos_hybrid*)The_Managed_Arena()->alloc(sizeof *eos_hyb);
     new (eos_hyb) eos_hybrid(eos_poly, gamma_th, rgeps, rgrho, rgye);
     assert(eos_hyb);
     break;
   }
   case eos_evol::Tabulated: {
+    CCTK_INFO("Setting evolution EOS to Tabulated3D");
     const string eos_filename = EOSTable_filename;
     eos_tab3d = (eos_tabulated3d*)The_Managed_Arena()->alloc(sizeof *eos_tab3d);
     new (eos_tab3d) eos_tabulated3d;

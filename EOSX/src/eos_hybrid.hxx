@@ -149,12 +149,12 @@ press_derivs_from_valid_rho_eps_ye(
 }
 
 // edited
-CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
+CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void
 entropy_from_valid_rho_temp_ye(const CCTK_REAL rho,
                                            const CCTK_REAL temp,
                                            const CCTK_REAL ye) const {
   // return log(temp * pow(rho, -gm1_th) / temp_over_eps);
-  throw logic_error(
+  printf(
       "EOS: entropy from temperature not implemented for eos_hybrid.");
 }
 
@@ -168,12 +168,12 @@ entropy_from_valid_rho_eps_ye(const CCTK_REAL rho,
 }
 
 // edited
-CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
+CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void
 eps_from_valid_rho_temp_ye(const CCTK_REAL rho,
                                        const CCTK_REAL temp,
                                        const CCTK_REAL ye) const {
   // return temp / temp_over_eps;
-  throw logic_error(
+  printf(
       "EOS: eps from temperature not implemented for eos_hybrid.");
 }
 
