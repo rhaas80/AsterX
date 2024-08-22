@@ -45,7 +45,7 @@ template <int FDORDER> void SourceTerms(CCTK_ARGUMENTS) {
         const CCTK_REAL detg = calc_det(g_avg);
         const CCTK_REAL sqrt_detg = sqrt(detg);
         /* Upper metric */
-        const smat<CCTK_REAL, 3> ug_avg = calc_inv(g_avg, detg);
+        const smat<CCTK_REAL, 3> ug_avg([](int i, int j){return CCTK_REAL(i==j);}); // = calc_inv(g_avg, detg);
 
         /* Derivatives of the lapse, shift and metric */
         /* calc_fd_v2c takes vertex center input, computes edge-center

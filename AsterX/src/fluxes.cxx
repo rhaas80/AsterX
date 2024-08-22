@@ -16,6 +16,10 @@
 #include <eos.hxx>
 #include <eos_idealgas.hxx>
 
+#ifdef __CUDACC__
+#include <nvToolsExt.h>
+#endif
+
 namespace AsterX {
 using namespace std;
 using namespace Loop;
@@ -147,14 +151,16 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
   const auto reconstruct_pt =
       [=] CCTK_DEVICE(const GF3D2<const CCTK_REAL> &var, const PointDesc &p,
                       const bool &gf_is_rho,
-                      const bool &gf_is_press) CCTK_ATTRIBUTE_ALWAYS_INLINE {
+                      const bool &gf_is_press) CCTK_ATTRIBUTE_ALWAYS_INLINE __attribute__((flatten)){
         return reconstruct(var, p, reconstruction, dir, gf_is_rho, gf_is_press,
                            press, gf_vels(dir), reconstruct_params);
       };
   const auto calcflux =
       [=] CCTK_DEVICE(vec<vec<CCTK_REAL, 4>, 2> lam, vec<CCTK_REAL, 2> var,
-                      vec<CCTK_REAL, 2> flux) CCTK_ATTRIBUTE_ALWAYS_INLINE {
+                      vec<CCTK_REAL, 2> flux) CCTK_ATTRIBUTE_ALWAYS_INLINE __attribute__((flatten)){
         CCTK_REAL flx;
+        flx = hlle(lam, var, flux);
+#if 0
         switch (fluxtype) {
 
         case flux_t::LxF: {
@@ -170,6 +176,7 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
         default:
           assert(0);
         }
+#endif
 
         return flx;
       };
@@ -187,7 +194,7 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
       face_centred
           [2]>(grid.nghostzones, [=] CCTK_DEVICE(
                                      const PointDesc
-                                         &p) CCTK_ATTRIBUTE_ALWAYS_INLINE {
+                                         &p) CCTK_ATTRIBUTE_ALWAYS_INLINE __attribute__((flatten)) {
 
     /* Reconstruct primitives from the cells on left (indice 0) and right
      * (indice 1) side of this face rc = reconstructed variables or
@@ -203,7 +210,7 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
 
     /* determinant of spatial metric */
     const CCTK_REAL detg_avg = calc_det(g_avg);
-    const CCTK_REAL sqrtg = sqrt(detg_avg);
+    const CCTK_REAL sqrtg = 1; //sqrt(detg_avg);
 
     vec<CCTK_REAL, 2> rho_rc{reconstruct_pt(rho, p, true, true)};
 
@@ -245,7 +252,7 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
     vec<vec<CCTK_REAL, 2>, 3> Bs_rc;
     array<CCTK_REAL,2> Bs_rc_dummy; // note: can't copy array<,2> to vec<,2>, only construct
 
-    Bs_rc(dir)(0) = gf_dBstags(dir)(p.I)/sqrtg;
+    Bs_rc(dir)(0) = gf_dBstags(dir)(p.I); ///sqrtg;
     Bs_rc(dir)(1) = Bs_rc(dir)(0);
 
     Bs_rc_dummy = reconstruct_pt(gf_Bvecs(dir_arr[0]), p, false, false);
@@ -275,8 +282,8 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
       vlows_rc = calc_contraction(g_avg, vels_rc);
 
       /* Lorentz factor: W = 1 / sqrt(1 - v^2) */
-      w_lorentz_rc(0) = 1 / sqrt(1 - calc_contraction(vlows_rc, vels_rc)(0));
-      w_lorentz_rc(1) = 1 / sqrt(1 - calc_contraction(vlows_rc, vels_rc)(1));
+      w_lorentz_rc(0) = 1 /* / sqrt(1 - calc_contraction(vlows_rc, vels_rc)(0)) */;
+      w_lorentz_rc(1) = 1 /* / sqrt(1 - calc_contraction(vlows_rc, vels_rc)(1)) */;
       break;
 
     };
@@ -288,13 +295,13 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
 
       const vec<vec<CCTK_REAL, 2>, 3> zveclow_rc = calc_contraction(g_avg, zvec_rc);
 
-      w_lorentz_rc(0) = sqrt(1 + calc_contraction(zveclow_rc, zvec_rc)(0));
-      w_lorentz_rc(1) = sqrt(1 + calc_contraction(zveclow_rc, zvec_rc)(1));
+      w_lorentz_rc(0) = 1.; //sqrt(1 + calc_contraction(zveclow_rc, zvec_rc)(0));
+      w_lorentz_rc(1) = 1.; //sqrt(1 + calc_contraction(zveclow_rc, zvec_rc)(1));
 
       for(int i = 0; i <= 2; ++i) { // loop over components
 	      for(int j = 0; j <= 1; ++j) { // loop over left and right state
-		      vels_rc(i)(j) = zvec_rc(i)(j)/w_lorentz_rc(j);
-		      vlows_rc(i)(j) = zveclow_rc(i)(j)/w_lorentz_rc(j);
+		      vels_rc(i)(j) = zvec_rc(i)(j); ///w_lorentz_rc(j);
+		      vlows_rc(i)(j) = zveclow_rc(i)(j); ///w_lorentz_rc(j);
 	       }
       }
       break;
@@ -308,15 +315,15 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
 
       const vec<vec<CCTK_REAL, 2>, 3> sveclow_rc = calc_contraction(g_avg, svec_rc);
 
-      w_lorentz_rc(0) = sqrt(0.5+sqrt(0.25+calc_contraction(sveclow_rc, svec_rc)(0)/rhoh_rc(0)/rhoh_rc(0)));
-      w_lorentz_rc(1) = sqrt(0.5+sqrt(0.25+calc_contraction(sveclow_rc, svec_rc)(1)/rhoh_rc(1)/rhoh_rc(1)));
+      w_lorentz_rc(0) = 1.0; //sqrt(0.5+sqrt(0.25+calc_contraction(sveclow_rc, svec_rc)(0)/rhoh_rc(0)/rhoh_rc(0)));
+      w_lorentz_rc(1) = 1.0; //sqrt(0.5+sqrt(0.25+calc_contraction(sveclow_rc, svec_rc)(1)/rhoh_rc(1)/rhoh_rc(1)));
 
       //printf("  wlor = %16.8e, %16.8e\n", w_lorentz_rc(0), w_lorentz_rc(1));
 
       for(int i = 0; i <= 2; ++i) { // loop over components
 	      for(int j = 0; j <= 1; ++j) { // loop over left and right state
-		      vels_rc(i)(j) = svec_rc(i)(j)/w_lorentz_rc(j)/w_lorentz_rc(j)/rhoh_rc(j);
-		      vlows_rc(i)(j) = sveclow_rc(i)(j)/w_lorentz_rc(j)/w_lorentz_rc(j)/rhoh_rc(j);
+		      vels_rc(i)(j) = svec_rc(i)(j); ///w_lorentz_rc(j)/w_lorentz_rc(j)/rhoh_rc(j);
+		      vlows_rc(i)(j) = sveclow_rc(i)(j); ///w_lorentz_rc(j)/w_lorentz_rc(j)/rhoh_rc(j);
 	       }
       }
       break;
@@ -343,12 +350,12 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
      *  b_i = B_i/W + alpha*b^0*v_i */
     const vec<vec<CCTK_REAL, 2>, 3> blows_rc([&](int i) ARITH_INLINE {
       return vec<CCTK_REAL, 2>([&](int f) ARITH_INLINE {
-        return Blows_rc(i)(f) / w_lorentz_rc(f) + alp_b0_rc(f) * vlows_rc(i)(f);
+        return Blows_rc(i)(f) /*/ w_lorentz_rc(f) */ + alp_b0_rc(f) * vlows_rc(i)(f);
       });
     });
     /* b^2 = b^{\mu} * b_{\mu} */
     const vec<CCTK_REAL, 2> bsq_rc([&](int f) ARITH_INLINE {
-      return (B2_rc(f) + pow2(alp_b0_rc(f))) / pow2(w_lorentz_rc(f));
+      return (B2_rc(f) + pow2(alp_b0_rc(f))) /*/ pow2(w_lorentz_rc(f))*/;
     });
 
     /* componets correspond to the dir we are considering */
@@ -369,7 +376,7 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
     });
     /* enthalpy h for ideal gas EOS */
     const vec<CCTK_REAL, 2> h_rc([&](int f) ARITH_INLINE {
-      return 1 + eps_rc(f) + press_rc(f) / rho_rc(f);
+      return 1 + eps_rc(f) + press_rc(f) /*/ rho_rc(f) */;
     });
     // } Ideal gas case
 
@@ -415,7 +422,7 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
     const CCTK_REAL alp_sqrtg = alp_avg * sqrtg;
     /* auxiliary: B^i / W */
     const vec<CCTK_REAL, 2> B_over_w_lorentz_rc(
-        [&](int f) ARITH_INLINE { return B_rc(f) / w_lorentz_rc(f); });
+        [&](int f) ARITH_INLINE { return B_rc(f) /*/ w_lorentz_rc(f)*/; });
 
     /* flux(dens) = sqrt(g) * D * vtilde^i = sqrt(g) * rho * W * vtilde^i */
     const vec<CCTK_REAL, 2> flux_dens(
@@ -449,7 +456,7 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
     /* Calculate eigenvalues: */
 
     /* variable for either g^xx, g^yy or g^zz depending on the direction */
-    const CCTK_REAL u_avg = calc_inv(g_avg, detg_avg)(dir, dir);
+    const CCTK_REAL u_avg = 1.; // = calc_inv(g_avg, detg_avg)(dir, dir);
     /* eigenvalues */
     vec<vec<CCTK_REAL, 4>, 2> lambda =
         eigenvalues(alp_avg, beta_avg, u_avg, vel_rc, rho_rc, cs2_rc,
@@ -487,6 +494,7 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
         isnan(fluxBxs(dir)(p.I)) || isnan(fluxBys(dir)(p.I)) ||
         isnan(fluxBzs(dir)(p.I)) || rho_rc(0) < 0.0 || rho_rc(1) < 0.0 ||
         press_rc(0) < 0.0 || press_rc(1) < 0.0) {
+#if 0
       printf("cctk_iteration = %i,  dir = %i,  ijk = %i, %i, %i, "
              "x, y, z = %16.8e, %16.8e, %16.8e.\n",
              cctk_iteration, dir, p.i, p.j, p.k, p.x, p.y, p.z);
@@ -552,6 +560,7 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
              vels_rc(2)(0), vels_rc(2)(1));
       printf("  vtilde_rc = %16.8e, %16.8e.\n", vtilde_rc(0), vtilde_rc(1));
       assert(0);
+#endif
     }
 
     /* Begin code for upwindCT */
@@ -568,13 +577,32 @@ void CalcFlux(CCTK_ARGUMENTS, EOSType &eos_th) {
         amin(dir)(p.I) = -1 * (min({CCTK_REAL(0), lambda(0)(0), lambda(0)(1),
                                     lambda(0)(2), lambda(0)(3), lambda(1)(0),
                                     lambda(1)(1), lambda(1)(2), lambda(1)(3)}));
+#if 0
+        const CCTK_REAL amaxL = max({CCTK_REAL(0), lambda(0)(0), lambda(0)(1),
+                              lambda(0)(2), lambda(0)(3), lambda(1)(0),
+                              lambda(1)(1), lambda(1)(2), lambda(1)(3)});
+        const CCTK_REAL aminL =-1 * (min({CCTK_REAL(0), lambda(0)(0), lambda(0)(1),
+                                    lambda(0)(2), lambda(0)(3), lambda(1)(0),
+                                    lambda(1)(1), lambda(1)(2), lambda(1)(3)}));
+
+        amax(dir)(p.I) = amaxL;
+
+        amin(dir)(p.I) = aminL;
+
+        vtildes_one(dir)(p.I) = (amaxL * vtildes_rc(dir1)(0) +
+                                 aminL * vtildes_rc(dir1)(1)) /
+                                (amaxL + aminL);
+        vtildes_two(dir)(p.I) = (amaxL * vtildes_rc(dir2)(0) +
+                                 aminL * vtildes_rc(dir2)(1)) /
+                                (amaxL + aminL);
+#endif
 
         vtildes_one(dir)(p.I) = (amax(dir)(p.I) * vtildes_rc(dir1)(0) +
-                                 amin(dir)(p.I) * vtildes_rc(dir1)(1)) /
-                                (amax(dir)(p.I) + amin(dir)(p.I));
+                                 amin(dir)(p.I) * vtildes_rc(dir1)(1)) /*/
+                                (amax(dir)(p.I) + amin(dir)(p.I))*/;
         vtildes_two(dir)(p.I) = (amax(dir)(p.I) * vtildes_rc(dir2)(0) +
-                                 amin(dir)(p.I) * vtildes_rc(dir2)(1)) /
-                                (amax(dir)(p.I) + amin(dir)(p.I));
+                                 amin(dir)(p.I) * vtildes_rc(dir2)(1)) /*/
+                                (amax(dir)(p.I) + amin(dir)(p.I))*/;
 
         /* End code for upwindCT */
 
@@ -598,7 +626,7 @@ void CalcAuxForAvecPsi(CCTK_ARGUMENTS) {
         const vec<CCTK_REAL, 3> betas{betax(p.I), betay(p.I), betaz(p.I)};
         const CCTK_REAL detg = calc_det(g);
         const CCTK_REAL sqrtg = sqrt(detg);
-        const smat<CCTK_REAL, 3> ug = calc_inv(g, detg);
+        const smat<CCTK_REAL, 3> ug([](int i, int j){return CCTK_REAL(i ==j);}); // = calc_inv(g, detg);
         const vec<CCTK_REAL, 3> Aup = calc_contraction(ug, A_vert);
 
         Fx(p.I) = alp(p.I) * sqrtg * Aup(0);
@@ -632,7 +660,13 @@ extern "C" void AsterX_Fluxes(CCTK_ARGUMENTS) {
   switch (eostype) {
   case eos_t::IdealGas: {
     eos_idealgas eos_th(gl_gamma, particle_mass, rgeps, rgrho, rgye);
+#ifdef __CUDACC__
+  const nvtxRangeId_t range = nvtxRangeStartA("Fluxes");
+#endif
     CalcFlux<0>(cctkGH, eos_th);
+#ifdef __CUDACC__
+  nvtxRangeEnd(range);
+#endif
     CalcFlux<1>(cctkGH, eos_th);
     CalcFlux<2>(cctkGH, eos_th);
     break;

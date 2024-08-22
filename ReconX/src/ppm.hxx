@@ -103,7 +103,7 @@ ppm(T gf_Imm, T gf_Im, T gf_I, T gf_Ip, T gf_Ipp, T press_Imm, T press_Im,
           (fabs(diff_I) - ppm_eps_shock * min(fabs(gf_Ip), fabs(gf_Im))) > 0.;
 
       const T eta_tilde_I = ((d2_prod < 0) and cond2)
-                                ? ((-1. / 6.) * (d2rho_Ip - d2rho_Im) / diff_I)
+                                ? ((-1. / 6.) * (d2rho_Ip - d2rho_Im) /*/ diff_I */)
                                 : 0;
       const T eta_I = max(0., min(ppm_eta1 * (eta_tilde_I - ppm_eta2), 1.));
 
@@ -127,8 +127,8 @@ ppm(T gf_Imm, T gf_Im, T gf_I, T gf_Ip, T gf_Ipp, T press_Imm, T press_Im,
         (fabs(press_Ipp - press_Imm) < ppm_small)
             ? 1.0
             : max(0.,
-                  1. - w_I * max(0., ppm_omega2 * ((diff_press_I /
-                                                    (press_Ipp - press_Imm)) -
+                  1. - w_I * max(0., ppm_omega2 * ((diff_press_I /*/
+                                                    (press_Ipp - press_Imm)*/) -
                                                    ppm_omega1)));
 
     const T one_minus_ftilde_I_gfI = (1 - ftilde_I) * gf_I;

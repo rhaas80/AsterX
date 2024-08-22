@@ -48,6 +48,13 @@ reconstruct(const GF3D2<const CCTK_REAL> &gf_var, const PointDesc &p,
   const auto Ipp = p.I + p.DI[dir];
   const auto Ippp = p.I + 2 * p.DI[dir];
 
+  return ppm_reconstruct(
+      gf_var(Immm), gf_var(Imm), gf_var(Im), gf_var(Ip), gf_var(Ipp),
+      gf_var(Ippp), gf_press(Immm), gf_press(Imm), gf_press(Im), gf_press(Ip),
+      gf_press(Ipp), gf_press(Ippp), gf_vel_dir(Imm), gf_vel_dir(Im),
+      gf_vel_dir(Ip), gf_vel_dir(Ipp), gf_is_rho, reconstruct_params);
+
+#if 0
   switch (reconstruction) {
 
   case reconstruction_t::Godunov: {
@@ -100,6 +107,7 @@ reconstruct(const GF3D2<const CCTK_REAL> &gf_var, const PointDesc &p,
   default:
     assert(0);
   }
+#endif
 }
 
 } // namespace ReconX

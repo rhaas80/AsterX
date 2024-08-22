@@ -126,14 +126,14 @@ CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
 eos_idealgas::eps_from_valid_rho_press_ye(const CCTK_REAL rho,
                                           const CCTK_REAL press,
                                           const CCTK_REAL ye) const {
-  return press / (rho * gm1);
+  return press /*/ (rho * gm1)*/;
 }
 
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL
 eos_idealgas::csnd_from_valid_rho_eps_ye(const CCTK_REAL rho,
                                          const CCTK_REAL eps,
                                          const CCTK_REAL ye) const {
-  return sqrt(gm1 * eps / (eps + 1 / gamma));
+  return /*sqrt*/(gm1 * eps /* / (eps + 1 / gamma) */);
 }
 
 CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline CCTK_REAL

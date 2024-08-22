@@ -44,8 +44,8 @@ hlle(vec<vec<CCTK_REAL, 4>, 2> lam, vec<CCTK_REAL, 2> var,
   const CCTK_REAL charpm = charmax - charmin;
 
   return (charmax * flux(0) - charmin * flux(1) +
-          charmax * charmin * (var(1) - var(0))) /
-         charpm;
+          charmax * charmin * (var(1) - var(0))); /* /
+         charpm;*/
 }
 
 } // namespace AsterX
